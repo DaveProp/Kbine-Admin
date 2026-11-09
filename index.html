@@ -148,13 +148,21 @@ table.dt input[type=checkbox]{width:18px;height:18px;padding:0}
 .modal img{width:100%;border-radius:10px}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:999px;font-weight:700;z-index:95}
 
+.pbar{height:12px;background:var(--surface2);border:1px solid var(--line);border-radius:99px;overflow:hidden;margin:6px 0 4px}.pbar i{display:block;height:100%;border-radius:99px}
+.goal .t{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:.88rem}.goal .t span{color:var(--muted)}
+.alertbox{background:var(--osoft);border:1.5px solid var(--orange);border-radius:12px;padding:10px 14px;margin-bottom:10px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+pre.report{white-space:pre-wrap;word-break:break-word;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;font-size:.88rem;margin:10px 0}
+.pos{color:var(--green);font-weight:800}.neg{color:var(--danger);font-weight:800}
+.mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:8px 0 14px}
+.mini>div{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px}.mini span{display:block;color:var(--muted);font-size:.74rem;font-weight:700;text-transform:uppercase}.mini b{font-size:1.1rem}
+
 /* Mobile : menu en bas */
 @media(max-width:820px){
   .app{display:block}
   .side{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;flex-direction:row;padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:40;gap:0;box-shadow:0 -6px 20px rgba(0,0,0,.25)}
   .brand,.sidefoot{display:none}
-  #tabs{flex-direction:row;width:100%}
-  #tabs button{flex:1;flex-direction:column;gap:2px;padding:6px 2px;font-size:.68rem;justify-content:center;align-items:center;text-align:center;position:relative}
+  #tabs{flex-direction:row;width:100%;overflow-x:auto}
+  #tabs button{flex:1 0 68px;white-space:nowrap;flex-direction:column;gap:2px;padding:6px 2px;font-size:.68rem;justify-content:center;align-items:center;text-align:center;position:relative}
   #tabs .n{position:absolute;top:0;right:14%;margin:0;padding:0 6px}
   main{padding:12px 12px 100px}
 }
@@ -181,7 +189,9 @@ table.dt input[type=checkbox]{width:18px;height:18px;padding:0}
       <button data-t="dash" aria-selected="true"><span class="ic">📊</span>Tableau de bord</button>
       <button data-t="orders" aria-selected="false"><span class="ic">🧾</span>Commandes<span class="n" id="pendN" hidden>0</span></button>
       <button data-t="clients" aria-selected="false"><span class="ic">👥</span>Clients</button>
+      <button data-t="fin" aria-selected="false"><span class="ic">💼</span>Finances</button>
       <button data-t="prices" aria-selected="false"><span class="ic">🏷️</span>Prix</button>
+      <button data-t="tools" aria-selected="false"><span class="ic">🧰</span>Outils</button>
       <button data-t="db" aria-selected="false"><span class="ic">🗄️</span>Base de données</button>
     </nav>
     <div class="sidefoot"><span class="live"></span><span id="syncInfo">Connexion…</span></div>
@@ -239,6 +249,8 @@ table.dt input[type=checkbox]{width:18px;height:18px;padding:0}
 
     <!-- Clients -->
     <div id="tab-clients" hidden></div>
+    <div id="tab-fin" hidden></div>
+    <div id="tab-tools" hidden></div>
 
     <!-- Prix -->
     <div id="tab-prices" hidden>
@@ -301,7 +313,7 @@ function short(n){n=Math.round(n);if(n>=1e6)return (n/1e6).toFixed(1).replace(".
 function sum(a,k){return a.reduce(function(s,o){return s+(+o[k]||0)},0)}
 var OPN={orange:"Orange",mtn:"MTN",moov:"Moov"}, STN={paid_declared:"À vérifier",verified:"Vérifiée",delivered:"Livrée",rejected:"Refusée"};
 var OPC={orange:"#f07d00",mtn:"#f2c200",moov:"#1b6fd1"}, STC={paid_declared:"#f07d00",verified:"#1b5fa8",delivered:"#1d8a3c",rejected:"#b3261e"};
-var TITLES={dash:["Tableau de bord","Vue d'ensemble de l'activité"],orders:["Commandes","Traitez, vérifiez et livrez"],clients:["Clients","Fichier clients et fidélité"],prices:["Prix et frais","Catalogue et règles de frais"],db:["Base de données","Explorer, exporter et sauvegarder les tables"]};
+var TITLES={dash:["Tableau de bord","Vue d'ensemble de l'activité"],orders:["Commandes","Traitez, vérifiez et livrez"],clients:["Clients","Fichier clients et fidélité"],prices:["Prix et frais","Catalogue et règles de frais"],db:["Base de données","Explorer, exporter et sauvegarder les tables"],fin:["Finances","Caisse, dépenses, bénéfice et soldes"],tools:["Outils","Numéros bloqués, codes promo et administrateurs"]};
 
 /* ---------- Thème ---------- */
 var theme="auto"; try{ theme=localStorage.getItem("kb_theme")||"auto" }catch(e){}
@@ -488,8 +500,12 @@ function paintSync(){
 
 /* ---------- Connexion ---------- */
 async function verifyAdmin(){
-  var r = await sb.from("admins").select("email");
+  var u=await sb.auth.getUser(); myEmail=String((u.data&&u.data.user&&u.data.user.email)||"").toLowerCase();
+  var r = await sb.from("admins").select("email,role");
+  if(r.error) r = await sb.from("admins").select("email");
   if(r.error || !r.data || !r.data.length){ await sb.auth.signOut(); return false }
+  var me=r.data.filter(function(x){return String(x.email||"").toLowerCase()===myEmail})[0];
+  myRole=(me&&me.role)||"owner";
   return true;
 }
 async function boot(){
@@ -505,7 +521,7 @@ $("loginForm").addEventListener("submit",async function(e){
   $("pw").value=""; unlockAudio(); showApp();
 });
 $("logoutBtn").addEventListener("click",async function(){await sb.auth.signOut();location.reload()});
-function showApp(){ $("loginView").hidden=true; $("appView").hidden=false; refresh(); startWatching() }
+function showApp(){ $("loginView").hidden=true; $("appView").hidden=false; applyRole(); refresh(); startWatching() }
 
 /* ---------- Données ---------- */
 async function loadOrders(){
@@ -542,14 +558,15 @@ async function loadCatalog(){
   }catch(e){}
   return catalog;
 }
-async function refresh(){ await Promise.all([loadOrders(),loadPrices()]); renderCurrent() }
+async function refresh(){ if(myRole==="staff") await Promise.all([loadOrders(),loadBlocked()]); else await Promise.all([loadOrders(),loadPrices(),loadBlocked()]); renderCurrent() }
 $("refreshBtn").addEventListener("click",function(){refresh();if(curTab==="db")loadDb();toast("Actualisé")});
 
 /* ---------- Onglets ---------- */
 function goTab(t){
+  if(myRole==="staff") t="orders";
   curTab=t;
   [].forEach.call($("tabs").children,function(x){x.setAttribute("aria-selected",x.dataset.t===t)});
-  ["dash","orders","clients","prices","db"].forEach(function(k){$("tab-"+k).hidden=k!==t});
+  ["dash","orders","clients","fin","prices","tools","db"].forEach(function(k){$("tab-"+k).hidden=k!==t});
   $("pageTitle").textContent=TITLES[t][0]; $("pageSub").textContent=TITLES[t][1];
   if(t==="dash") paintSync();
   renderCurrent(); window.scrollTo(0,0);
@@ -563,6 +580,8 @@ function renderCurrent(){
   else if(curTab==="orders") renderOrders();
   else if(curTab==="clients") renderClients();
   else if(curTab==="prices") renderPrices();
+  else if(curTab==="fin") renderFin();
+  else if(curTab==="tools") renderTools();
   else if(curTab==="db"&&!dbLoaded) loadDb();
 }
 
@@ -662,6 +681,7 @@ function renderDash(){
   ];
   var h='<div class="kpis">'+kp.map(function(k){return '<div class="card kpi '+k[0]+'"><span class="ico">'+k[1]+'</span><span class="lab">'+k[2]+'</span><b>'+k[3]+'</b>'+k[4]+'</div>'}).join("")+'</div>';
 
+  h+=balAlertsHtml()+goalsHtml();
   var step=span>90?7:1, nb=Math.ceil(span/step), B=[], i;
   for(i=0;i<nb;i++){ var d=new Date(start); d.setDate(d.getDate()+i*step); B.push({d:d,rev:0,cnt:0}) }
   cur.forEach(function(o){
@@ -698,6 +718,7 @@ function renderDash(){
   var cls=Object.keys(cl).sort(function(a,b){return cl[b].t-cl[a].t}).slice(0,6).map(function(k){return {l:cl[k].name,v:cl[k].t,s:fmt(cl[k].t)+" · "+cl[k].n+" cmd",c:"var(--orange)"}});
   h+='<div class="g g11"><div class="card"><h3>Forfaits les plus demandés</h3>'+hbars(tl)+'</div><div class="card"><h3>Meilleurs clients (livré)</h3>'+hbars(cls)+'</div></div>';
 
+  h+=reportCardHtml();
   h+='<div class="card"><h3>Dernières commandes</h3><div class="tablewrap"><table class="dt"><thead><tr><th>Date</th><th>Client</th><th>Forfait</th><th>Réseau</th><th class="r">Total</th><th>Statut</th></tr></thead><tbody>'+
      orders.slice(0,8).map(function(o){return '<tr data-id="'+o.id+'"><td>'+esc(fdate(o.created_at))+'</td><td>'+esc(cname(o)||"—")+'</td><td class="cut">'+esc(o.item_name)+'</td><td><i class="opdot" style="background:'+(OPC[o.operator]||"#999")+'"></i>'+esc(OPN[o.operator]||o.operator)+'</td><td class="r">'+fmt(o.total)+'</td><td><span class="badge st-'+o.status+'">'+STN[o.status]+'</span></td></tr>'}).join("")+
      '</tbody></table></div></div>';
@@ -705,6 +726,8 @@ function renderDash(){
 }
 $("tab-dash").addEventListener("click",function(e){
   var g=e.target.closest("[data-go]"); if(g){ goTab(g.dataset.go); return }
+  if(e.target.closest("[data-goal-edit]")){ openGoals(); return }
+  var rp=e.target.closest("[data-rep]"); if(rp){ var rv=rp.dataset.rep; if(rv==="copy"){ navigator.clipboard.writeText(reportText(repDay)).then(function(){toast("Rapport copié")},function(){toast("Copie impossible")}) } else { repDay=+rv; renderDash() } return }
   var r=e.target.closest("tr[data-id]"); if(r) openDetail(r.dataset.id);
 });
 
@@ -734,6 +757,7 @@ function cardHtml(o){
     '<div style="text-align:right"><span class="badge st-'+o.status+'">'+STN[o.status]+'</span><div><b>'+fmt(o.total)+'</b></div></div></div>'+
     '<div class="kv">'+
       (cname(o)?'<div><span>Client</span> <b>'+esc(cname(o))+'</b></div>':'')+
+      (orderBlocked(o)?'<div><span class="neg">🚫 Numéro bloqué</span></div>':'')+
       '<div><span>Réseau</span> <i class="opdot" style="background:'+(OPC[o.operator]||"#999")+'"></i>'+esc(OPN[o.operator]||o.operator)+'</div>'+
       (o.category?'<div><span>Catégorie</span> '+esc(o.category)+'</div>':'')+
       (tf?'<div><span>Bénéficiaire</span> <b>'+esc(o.dest_phone)+'</b></div><div><span>Expéditeur</span> '+esc(o.phone)+'</div><div><span>Transfert / frais</span> '+fmt(o.amount)+' / '+fmt(o.fee)+'</div>'
@@ -749,8 +773,10 @@ function cardHtml(o){
       (o.status!=="rejected"?'<button class="btn d s" data-act="rejected">Refuser</button>':'')+
       (o.status!=="paid_declared"?'<button class="btn g s" data-act="paid_declared">Remettre à traiter</button>':'')+
       '<button class="btn g s" data-act="copy">Copier le n°</button>'+
+      '<button class="btn g s" data-act="receipt">Reçu PDF</button>'+
+      '<button class="btn d s" data-act="block">'+(orderBlocked(o)?'Débloquer le n°':'Bloquer le n°')+'</button>'+
       '<button class="btn g s" data-act="savenote">Enregistrer la note</button>'+
-      '<button class="btn d s" data-act="del">Supprimer</button>'+
+      (myRole==="staff"?'':'<button class="btn d s" data-act="del">Supprimer</button>')+
     '</div></div>';
 }
 function tableHtml(list){
@@ -802,6 +828,8 @@ async function onAct(e){
   var b=e.target.closest("button[data-act]"); if(!b) return;
   var card=b.closest("[data-id]"), o=card&&findOrder(card.dataset.id); if(!o) return;
   var a=b.dataset.act, inModal=!!b.closest("#modal");
+  if(a==="receipt"){ printReceipt(o); return }
+  if(a==="block"){ await toggleBlock(o); if(inModal) openDetail(o.id); return }
   if(a==="copy"){ var n=o.kind==="tf"?o.dest_phone:o.phone; try{await navigator.clipboard.writeText(n);toast("Numéro copié")}catch(x){toast(n)} return }
   if(a==="shot"){
     var r=await sb.storage.from("receipts").createSignedUrl(o.receipt_path,600);
@@ -855,6 +883,7 @@ function renderClients(){
   var q=cQuery.toLowerCase();
   var l=all.filter(function(c){return !q||[c.name,c.email,Object.keys(c.phones).join(" ")].join(" ").toLowerCase().indexOf(q)>=0});
   l.sort(function(a,b){ return cSort==="spent"?b.total-a.total:cSort==="count"?b.n-a.n:cSort==="name"?String(a.name).localeCompare(b.name):(a.last<b.last?1:-1) });
+  clientList=l;
   var mails=all.filter(function(c){return c.email}).length;
   var h='<div class="kpis">'+
     '<div class="card kpi"><span class="ico">👥</span><span class="lab">Clients</span><b>'+all.length+'</b><span class="note">'+mails+' avec email</span></div>'+
@@ -864,10 +893,10 @@ function renderClients(){
     '<div class="bar"><input type="search" id="cQ" placeholder="Rechercher un client, email ou numéro" value="'+esc(cQuery)+'"><select id="cSortSel"><option value="last">Dernière commande</option><option value="spent">Plus dépensé</option><option value="count">Plus de commandes</option><option value="name">Nom A→Z</option></select>'+
     '<button class="btn s" id="cpMails" type="button">Copier les emails</button><button class="btn g s" id="csvMails" type="button">Exporter CSV</button></div>'+
     '<div class="card flat"><div class="tablewrap">'+(l.length?'<table class="dt"><thead><tr><th>Client</th><th>Email</th><th>Numéros</th><th class="r">Cmd</th><th class="r">Dépensé</th><th>Dernière</th><th></th></tr></thead><tbody>'+
-    l.map(function(c){
+    l.map(function(c,gi){
       var tag=c.dn>=3?'<span class="chip"><b>Fidèle</b></span>':c.n===1?'<span class="chip">Nouveau</span>':'';
       var wa=waNum(c.lastPhone);
-      return '<tr><td><b>'+esc(c.name||"—")+'</b> '+tag+'</td><td>'+esc(c.email||"")+'</td><td>'+esc(Object.keys(c.phones).join(", "))+'</td><td class="r">'+c.n+'</td><td class="r">'+fmt(c.total)+'</td><td>'+esc(fdate(c.last))+'</td><td>'+(wa?'<a class="btn wa s" target="_blank" rel="noopener" href="https://wa.me/'+wa+'?text='+encodeURIComponent("Bonjour"+(c.name?" "+c.name:"")+" 👋 K-Bine CI")+'">WhatsApp</a>':'')+'</td></tr>';
+      return '<tr><td><b>'+esc(c.name||"—")+'</b> '+tag+'</td><td>'+esc(c.email||"")+'</td><td>'+esc(Object.keys(c.phones).join(", "))+'</td><td class="r">'+c.n+'</td><td class="r">'+fmt(c.total)+'</td><td>'+esc(fdate(c.last))+'</td><td>'+(wa?'<a class="btn wa s" target="_blank" rel="noopener" href="https://wa.me/'+wa+'?text='+encodeURIComponent("Bonjour"+(c.name?" "+c.name:"")+" 👋 K-Bine CI")+'">WhatsApp</a>':'')+(c.dn>=2?' <button class="btn g s" data-gift="'+gi+'" type="button">🎁 Code</button>':'')+'</td></tr>';
     }).join("")+'</tbody></table>':'<p class="note" style="padding:10px">Aucun client trouvé.</p>')+'</div></div>';
   $("tab-clients").innerHTML=h;
   $("cSortSel").value=cSort;
@@ -983,6 +1012,303 @@ $("dbBackup").addEventListener("click",async function(){
   }
   dl("sauvegarde-kbine-"+dayKey(new Date())+".json",JSON.stringify(out,null,2),"application/json");
   b.disabled=false; toast("Sauvegarde téléchargée");
+});
+
+/* ======== Nouveautés : objectifs, rapport du jour, finances, outils ======== */
+var myRole="owner", myEmail="";
+var blocked={}, promos=[], expenses=[], closures=[], adminsList=[], clientList=[];
+var finBuilt=false, toolsBuilt=false, finMissing=false, finErr="", toolsMissing={}, adminsHasRole=true, repDay=0;
+var OPLIST=["orange","mtn","moov"];
+var SETUP_MSG='<div class="alertbox"><div><b>Configuration requise</b><div class="note">Ces fonctions ont besoin de nouvelles tables. Dans Supabase → SQL Editor, collez le contenu du fichier <b>kbine-setup.sql</b>, cliquez sur Run, puis actualisez cette page.</div></div></div>';
+function norm(p){ return String(p||"").replace(/\D/g,"").slice(-10) }
+function num(v){ return Math.round(+v||0) }
+function monthKey(d){ var x=new Date(d); return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0") }
+function missingTbl(err){ return !!err&&/does not exist|schema cache|could not find|relation/i.test(err.message||"") }
+function isBlockedNum(p){ var n=norm(p); return n.length>=8&&!!blocked[n] }
+function orderBlocked(o){ return isBlockedNum(o.phone)||isBlockedNum(o.dest_phone) }
+function setupToast(err){ toast(missingTbl(err)?"Exécutez d'abord kbine-setup.sql dans Supabase":"Erreur : "+err.message) }
+async function saveSettingRows(rows){ var r=await sb.from("settings").upsert(rows); if(!r.error) rows.forEach(function(x){settings[x.key]=x.value}); return r }
+function frDay(k){ return String(k||"").split("-").reverse().join("/") }
+
+/* ---------- Rôles : l'employé ne voit que les commandes ---------- */
+function applyRole(){
+  if(myRole!=="staff") return;
+  [].forEach.call($("tabs").children,function(b){ if(b.dataset.t!=="orders") b.hidden=true });
+  $("csvBtn").hidden=true;
+  goTab("orders");
+}
+
+/* ---------- Numéros bloqués ---------- */
+async function loadBlocked(){
+  var r=await sb.from("blocked_numbers").select("*"); blocked={};
+  if(r.error){ toolsMissing.blocked=missingTbl(r.error); return }
+  toolsMissing.blocked=false;
+  (r.data||[]).forEach(function(x){ blocked[norm(x.phone)]=x });
+}
+async function toggleBlock(o){
+  var p=o.phone; if(!isBlockedNum(p)&&isBlockedNum(o.dest_phone)) p=o.dest_phone;
+  var n=norm(p); if(n.length<8){ toast("Numéro invalide"); return }
+  var r;
+  if(isBlockedNum(p)){
+    if(!confirm("Débloquer le "+p+" ?")) return;
+    r=await sb.from("blocked_numbers").delete().eq("phone",n);
+  } else {
+    if(!confirm("Bloquer le "+p+" ?")) return;
+    r=await sb.from("blocked_numbers").insert({phone:n,reason:"Depuis la commande "+(o.ref||"")});
+  }
+  if(r.error){ setupToast(r.error); return }
+  await loadBlocked(); toast(isBlockedNum(p)?"Numéro bloqué":"Numéro débloqué"); renderCurrent();
+}
+
+/* ---------- Objectif mensuel ---------- */
+function goalsHtml(){
+  var gR=num(settings.goal_revenue), gF=num(settings.goal_fees), now=new Date(), mk=monthKey(now);
+  var del=orders.filter(function(o){return o.status==="delivered"&&monthKey(o.created_at)===mk});
+  var rev=sum(del,"total"), fee=sum(del,"fee");
+  var dim=new Date(now.getFullYear(),now.getMonth()+1,0).getDate(), dd=now.getDate();
+  var mois=now.toLocaleDateString("fr-FR",{month:"long",year:"numeric"});
+  function bar(label,val,goal,color){
+    if(!goal) return '<div class="goal"><div class="t"><b>'+label+'</b><span>'+fmt(val)+' · objectif non défini</span></div></div>';
+    var p=Math.round(val/goal*100), proj=Math.round(val/dd*dim);
+    return '<div class="goal"><div class="t"><b>'+label+'</b><span>'+fmt(val)+' / '+fmt(goal)+' · <b>'+p+' %</b></span></div><div class="pbar"><i style="width:'+Math.min(100,p)+'%;background:'+color+'"></i></div><div class="note">Au rythme actuel : '+fmt(proj)+' en fin de mois'+(val>=goal?' · 🎉 objectif atteint':'')+'</div></div>';
+  }
+  return '<div class="card" style="margin-bottom:14px"><div class="top"><h3 style="margin:0">🎯 Objectif de '+esc(mois)+'</h3><button class="btn g s" data-goal-edit type="button">Modifier</button></div><div class="g g11" style="margin:10px 0 0">'+bar("Chiffre d'affaires",rev,gR,"var(--green)")+bar("Frais gagnés",fee,gF,"var(--orange)")+'</div></div>';
+}
+function openGoals(){
+  openModal('<h2 style="margin:4px 0">Objectifs du mois</h2><label for="gR">Chiffre d\'affaires visé (F CFA)</label><input id="gR" type="number" min="0" step="1000" value="'+esc(settings.goal_revenue||"")+'"><label for="gF">Frais gagnés visés (F CFA)</label><input id="gF" type="number" min="0" step="500" value="'+esc(settings.goal_fees||"")+'"><div class="row" style="margin-top:12px"><button class="btn" data-x="gSave" type="button">Enregistrer</button><button class="btn g s" data-close type="button">Annuler</button></div>');
+}
+
+/* ---------- Soldes opérateurs (estimés) ---------- */
+function estBal(op){
+  var raw=settings["bal_"+op]; if(raw==null||raw==="") return null;
+  var at=settings["bal_"+op+"_at"]?new Date(settings["bal_"+op+"_at"]):new Date(0);
+  var used=sum(orders.filter(function(o){return o.operator===op&&o.status==="delivered"&&new Date(o.created_at)>at}),"amount");
+  return num(raw)-used;
+}
+function balAlertsHtml(noBtn){
+  var out="";
+  OPLIST.forEach(function(op){
+    var b=estBal(op), m=num(settings["min_"+op]);
+    if(b!=null&&m&&b<m) out+='<div class="alertbox"><div>⚠️ <b>Solde '+OPN[op]+' bas</b> : environ '+fmt(b)+' (seuil '+fmt(m)+')</div>'+(noBtn?'':'<button class="btn o s" data-go="fin" type="button">Mettre à jour</button>')+'</div>';
+  });
+  return out;
+}
+function openBal(op){
+  var b=estBal(op);
+  openModal('<h2 style="margin:4px 0">Solde '+esc(OPN[op])+'</h2><label for="bVal">Solde actuel réel (F CFA)</label><input id="bVal" type="number" min="0" step="100" placeholder="'+(b==null?"":"estimé : "+b)+'"><label for="bMin">Alerte quand le solde descend sous (F CFA)</label><input id="bMin" type="number" min="0" step="500" value="'+esc(settings["min_"+op]||"")+'"><p class="note">Laissez le solde vide pour ne changer que le seuil.</p><div class="row"><button class="btn" data-x="balSave" data-op="'+op+'" type="button">Enregistrer</button><button class="btn g s" data-close type="button">Annuler</button></div>');
+}
+
+/* ---------- Rapport du jour ---------- */
+function reportText(off){
+  var d=new Date(); d.setDate(d.getDate()-off); var k=dayKey(d);
+  var day=orders.filter(function(o){return dayKey(o.created_at)===k}), del=day.filter(function(o){return o.status==="delivered"}), top={};
+  day.filter(function(o){return o.status!=="rejected"}).forEach(function(o){top[o.item_name]=(top[o.item_name]||0)+1});
+  var tl=Object.keys(top).sort(function(a,b){return top[b]-top[a]}).slice(0,3);
+  var ops=OPLIST.map(function(op){return OPN[op]+" "+day.filter(function(o){return o.operator===op}).length}).join(" · ");
+  var t="📊 Rapport K-Bine CI — "+d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+"\n"+
+    "🧾 Commandes reçues : "+day.length+" (livrées : "+del.length+")\n"+
+    "💰 Encaissé : "+fmt(sum(del,"total"))+"\n"+
+    "📈 Frais gagnés : "+fmt(sum(del,"fee"))+"\n"+
+    "⏳ À traiter en ce moment : "+orders.filter(isTodo).length+"\n";
+  if(tl.length) t+="🏆 Top forfaits :\n"+tl.map(function(n,i){return (i+1)+". "+n+" ("+top[n]+")"}).join("\n")+"\n";
+  return t+"📶 Réseaux : "+ops;
+}
+function reportCardHtml(){
+  var t=reportText(repDay);
+  return '<div class="card" style="margin-bottom:14px"><div class="top"><h3 style="margin:0">📲 Rapport du jour</h3><div class="seg"><button data-rep="0" aria-pressed="'+(repDay===0)+'" type="button">Aujourd\'hui</button><button data-rep="1" aria-pressed="'+(repDay===1)+'" type="button">Hier</button></div></div><pre class="report">'+esc(t)+'</pre><div class="row"><a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent(t)+'">Envoyer sur WhatsApp</a><button class="btn g s" data-rep="copy" type="button">Copier</button></div></div>';
+}
+
+/* ---------- Reçu imprimable / PDF ---------- */
+function printReceipt(o){
+  var tf=o.kind==="tf", rows=[["Référence",o.ref],["Date",fdate(o.created_at)]];
+  if(cname(o)) rows.push(["Client",cname(o)]);
+  rows.push([tf?"Opération":"Forfait",o.item_name],["Réseau",OPN[o.operator]||o.operator]);
+  if(tf) rows.push(["Expéditeur",o.phone],["Bénéficiaire",o.dest_phone]); else rows.push(["Numéro rechargé",o.phone]);
+  rows.push([tf?"Montant transféré":"Prix",fmt(o.amount)],["Frais",fmt(o.fee)],["Statut",STN[o.status]||o.status]);
+  var html='<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reçu '+esc(o.ref)+'</title><style>body{font:14px/1.5 system-ui,Arial,sans-serif;margin:0;padding:24px;color:#14231a}.r{max-width:420px;margin:0 auto;border:2px solid #1d8a3c;border-radius:14px;padding:22px}h1{margin:0;font-size:22px}h1 span{color:#f07d00}.s{color:#5b6b60;font-size:12px;margin:2px 0 14px}table{width:100%;border-collapse:collapse}td{padding:6px 0;border-bottom:1px dashed #cfd8cc;vertical-align:top}td:first-child{color:#5b6b60;width:42%}td:last-child{text-align:right;font-weight:600}.t td{border-bottom:0;font-size:18px;font-weight:800;color:#1d8a3c;padding-top:12px}.f{text-align:center;color:#5b6b60;font-size:12px;margin-top:16px}.b{text-align:center;margin-top:16px}@media print{.b{display:none}body{padding:0}}</style></head><body><div class="r"><h1>K-Bine <span>CI</span></h1><div class="s">Reçu de '+(tf?"transfert":"commande")+'</div><table>'+
+    rows.map(function(r){return '<tr><td>'+esc(r[0])+'</td><td>'+esc(r[1])+'</td></tr>'}).join("")+
+    '<tr class="t"><td>TOTAL PAYÉ</td><td>'+esc(fmt(o.total))+'</td></tr></table><div class="f">Merci pour votre confiance !</div></div><div class="b"><button onclick="window.print()">Imprimer / Enregistrer en PDF</button></div></body></html>';
+  var w=window.open("","_blank");
+  if(!w){ toast("Autorisez les fenêtres pop-up pour imprimer"); return }
+  w.document.write(html); w.document.close();
+  setTimeout(function(){ try{ w.focus(); w.print() }catch(e){} },400);
+}
+
+/* ---------- Actions des fenêtres (objectifs, soldes) ---------- */
+$("modalIn").addEventListener("click",async function(e){
+  var b=e.target.closest("button[data-x]"); if(!b) return;
+  var x=b.dataset.x, r;
+  if(x==="gSave"){
+    r=await saveSettingRows([{key:"goal_revenue",value:String(num($("gR").value))},{key:"goal_fees",value:String(num($("gF").value))}]);
+    if(r.error){ toast("Erreur : "+r.error.message); return }
+    $("modal").hidden=true; toast("Objectifs enregistrés"); renderCurrent();
+  } else if(x==="balSave"){
+    var op=b.dataset.op, rows=[{key:"min_"+op,value:String(num($("bMin").value))}];
+    if($("bVal").value!=="") rows.push({key:"bal_"+op,value:String(num($("bVal").value))},{key:"bal_"+op+"_at",value:new Date().toISOString()});
+    r=await saveSettingRows(rows);
+    if(r.error){ toast("Erreur : "+r.error.message); return }
+    $("modal").hidden=true; toast("Solde enregistré"); renderCurrent();
+  }
+});
+
+/* ---------- Finances : caisse, soldes, dépenses, bénéfice ---------- */
+async function loadFin(){
+  var a=await sb.from("expenses").select("*").order("day",{ascending:false}).limit(2000);
+  var b=await sb.from("closures").select("*").order("day",{ascending:false}).limit(120);
+  finMissing=missingTbl(a.error)||missingTbl(b.error);
+  var er=a.error||b.error; finErr=(er&&!finMissing)?er.message:"";
+  expenses=a.error?[]:(a.data||[]); closures=b.error?[]:(b.data||[]);
+}
+function dayFigures(k){
+  var del=orders.filter(function(o){return o.status==="delivered"&&dayKey(o.created_at)===k});
+  var enc=sum(del,"total"), dep=sum(expenses.filter(function(e){return String(e.day)===k}),"amount");
+  return {n:del.length,enc:enc,dep:dep,exp:enc-dep};
+}
+function finSkeleton(){
+  $("tab-fin").innerHTML='<div id="finNotice"></div>'+
+    '<h2>Caisse et clôture</h2><div class="card" style="margin-bottom:14px"><div class="bar" style="margin-top:0"><input type="date" id="cDay" aria-label="Jour"></div><div id="cBox"></div>'+
+    '<div class="stats"><div><label for="cCount">Argent réel compté (F CFA)</label><input id="cCount" type="number" min="0" step="50"></div><div><label for="cNote">Note (facultatif)</label><input id="cNote" type="text" maxlength="200"></div></div>'+
+    '<p><button class="btn" id="cClose" type="button">Clôturer la journée</button></p><div id="cList"></div></div>'+
+    '<h2>Soldes opérateurs</h2><div class="card" id="balBox" style="margin-bottom:14px"></div>'+
+    '<h2>Dépenses et bénéfice</h2><div class="card" style="margin-bottom:14px"><div class="bar" style="margin-top:0"><input type="month" id="eMonth" aria-label="Mois"></div><div id="eSummary"></div></div>'+
+    '<div class="card"><h3>Ajouter une dépense</h3><div class="stats"><div><label for="eDay">Date</label><input type="date" id="eDay"></div><div><label for="eOp">Réseau</label><select id="eOp"><option value="orange">Orange</option><option value="mtn">MTN</option><option value="moov">Moov</option><option value="autre">Autre</option></select></div><div><label for="eLabel">Libellé</label><input id="eLabel" type="text" maxlength="120" placeholder="Achat de crédit, internet…"></div><div><label for="eAmt">Montant (F CFA)</label><input id="eAmt" type="number" min="0" step="50"></div></div><p><button class="btn" id="eAdd" type="button">Ajouter la dépense</button></p><div id="eList"></div></div>';
+  $("cDay").value=dayKey(new Date()); $("eDay").value=dayKey(new Date()); $("eMonth").value=monthKey(new Date());
+  $("cDay").onchange=renderFinDyn; $("eMonth").onchange=renderFinDyn;
+  $("cClose").onclick=closeDay; $("eAdd").onclick=addExpense;
+  $("tab-fin").onclick=async function(e){
+    var b=e.target.closest("[data-bal]"); if(b){ openBal(b.dataset.bal); return }
+    var c=e.target.closest("[data-cdel]"); if(c){ if(!confirm("Supprimer cette clôture ?")) return; var r=await sb.from("closures").delete().eq("day",c.dataset.cdel); if(r.error){ setupToast(r.error); return } await loadFin(); renderFinDyn(); return }
+    var d=e.target.closest("[data-edel]"); if(d){ if(!confirm("Supprimer cette dépense ?")) return; var r2=await sb.from("expenses").delete().eq("id",d.dataset.edel); if(r2.error){ setupToast(r2.error); return } await loadFin(); renderFinDyn() }
+  };
+}
+async function closeDay(){
+  var k=$("cDay").value; if(!k){ toast("Choisissez une date"); return }
+  if($("cCount").value===""){ toast("Saisissez l'argent compté"); return }
+  var f=dayFigures(k), c=num($("cCount").value);
+  var r=await sb.from("closures").upsert({day:k,expected:f.exp,counted:c,diff:c-f.exp,note:$("cNote").value.trim()||null},{onConflict:"day"});
+  if(r.error){ setupToast(r.error); return }
+  $("cCount").value=""; $("cNote").value=""; toast("Journée clôturée");
+  await loadFin(); renderFinDyn();
+}
+async function addExpense(){
+  var label=$("eLabel").value.trim(), amt=num($("eAmt").value), day=$("eDay").value;
+  if(!day){ toast("Choisissez une date"); return }
+  if(!label){ toast("Saisissez un libellé"); return }
+  if(amt<=0){ toast("Saisissez un montant"); return }
+  var r=await sb.from("expenses").insert({day:day,operator:$("eOp").value,label:label,amount:amt});
+  if(r.error){ setupToast(r.error); return }
+  $("eLabel").value=""; $("eAmt").value=""; toast("Dépense ajoutée");
+  await loadFin(); renderFinDyn();
+}
+function renderFin(){
+  if(!finBuilt){ finSkeleton(); finBuilt=true; loadFin().then(renderFinDyn); renderFinDyn(); return }
+  renderFinDyn();
+}
+function renderFinDyn(){
+  if(!$("cBox")) return;
+  $("finNotice").innerHTML=(finMissing?SETUP_MSG:"")+(finErr?'<p class="err">'+esc(finErr)+'</p>':"")+balAlertsHtml(true);
+  var k=$("cDay").value||dayKey(new Date()), f=dayFigures(k), cl=closures.filter(function(c){return String(c.day)===k})[0];
+  $("cBox").innerHTML='<div class="mini"><div><span>Livrées</span><b>'+f.n+'</b></div><div><span>Encaissé</span><b>'+fmt(f.enc)+'</b></div><div><span>Dépenses du jour</span><b>'+fmt(f.dep)+'</b></div><div><span>Attendu en caisse</span><b>'+fmt(f.exp)+'</b></div></div>'+
+    (cl?'<p class="note">Déjà clôturée : compté '+fmt(cl.counted)+' · écart <span class="'+(cl.diff<0?"neg":"pos")+'">'+(cl.diff>0?"+":"")+fmt(cl.diff)+'</span>. Une nouvelle clôture remplace celle-ci.</p>':'');
+  $("cList").innerHTML='<h3 style="margin:14px 0 6px">Dernières clôtures</h3>'+(closures.length?'<div class="tablewrap"><table class="dt"><thead><tr><th>Jour</th><th class="r">Attendu</th><th class="r">Compté</th><th class="r">Écart</th><th>Note</th><th></th></tr></thead><tbody>'+
+    closures.slice(0,14).map(function(c){return '<tr><td>'+esc(frDay(c.day))+'</td><td class="r">'+fmt(c.expected)+'</td><td class="r">'+fmt(c.counted)+'</td><td class="r '+(c.diff<0?"neg":c.diff>0?"pos":"")+'">'+(c.diff>0?"+":"")+fmt(c.diff)+'</td><td class="cut">'+esc(c.note||"")+'</td><td><button class="btn d s" data-cdel="'+esc(c.day)+'" type="button">Supprimer</button></td></tr>'}).join("")+'</tbody></table></div>':'<p class="note">Aucune clôture enregistrée.</p>');
+  $("balBox").innerHTML=OPLIST.map(function(op){
+    var b=estBal(op), m=num(settings["min_"+op]), low=b!=null&&m&&b<m;
+    return '<div class="prow" style="grid-template-columns:1fr 1fr auto"><div class="nm"><b><i class="opdot" style="background:'+OPC[op]+'"></i>'+OPN[op]+'</b><small>'+(settings["bal_"+op+"_at"]?"Solde saisi le "+esc(fdate(settings["bal_"+op+"_at"])):"Solde non renseigné")+'</small></div><div>'+(b==null?'<span class="note">—</span>':'<b class="'+(low?"neg":"")+'">≈ '+fmt(b)+'</b>')+'<div class="note">Seuil d\'alerte : '+(m?fmt(m):"aucun")+'</div></div><button class="btn s" data-bal="'+op+'" type="button">Mettre à jour</button></div>';
+  }).join("")+'<p class="note" style="margin:8px 0 0">Solde estimé = dernier solde saisi moins les forfaits et transferts livrés depuis.</p>';
+  var mk=$("eMonth").value||monthKey(new Date());
+  var mo=orders.filter(function(o){return o.status==="delivered"&&monthKey(o.created_at)===mk});
+  var ex=expenses.filter(function(e){return String(e.day).slice(0,7)===mk});
+  var enc=sum(mo,"total"), dep=sum(ex,"amount"), ben=enc-dep;
+  $("eSummary").innerHTML='<div class="mini"><div><span>Encaissé</span><b>'+fmt(enc)+'</b></div><div><span>Dépenses</span><b>'+fmt(dep)+'</b></div><div><span>Bénéfice réel</span><b class="'+(ben<0?"neg":"pos")+'">'+fmt(ben)+'</b></div><div><span>Frais gagnés</span><b>'+fmt(sum(mo,"fee"))+'</b></div></div>'+
+    '<div class="tablewrap"><table class="dt"><thead><tr><th>Réseau</th><th class="r">Encaissé</th><th class="r">Dépensé</th><th class="r">Résultat</th></tr></thead><tbody>'+
+    OPLIST.concat(["autre"]).map(function(op){var e1=sum(mo.filter(function(o){return o.operator===op}),"total"), d1=sum(ex.filter(function(e){return e.operator===op}),"amount"), r1=e1-d1; return '<tr><td>'+esc(OPN[op]||"Autre")+'</td><td class="r">'+fmt(e1)+'</td><td class="r">'+fmt(d1)+'</td><td class="r '+(r1<0?"neg":"pos")+'">'+fmt(r1)+'</td></tr>'}).join("")+'</tbody></table></div>'+
+    '<p class="note" style="margin:8px 0 0">Bénéfice réel = encaissé − dépenses du mois. Un achat de crédit pas encore revendu fait baisser le bénéfice du mois.</p>';
+  $("eList").innerHTML='<h3 style="margin:14px 0 6px">Dépenses du mois</h3>'+(ex.length?'<div class="tablewrap"><table class="dt"><thead><tr><th>Date</th><th>Réseau</th><th>Libellé</th><th class="r">Montant</th><th></th></tr></thead><tbody>'+
+    ex.map(function(e){return '<tr><td>'+esc(frDay(e.day))+'</td><td>'+esc(OPN[e.operator]||"Autre")+'</td><td class="cut">'+esc(e.label)+'</td><td class="r">'+fmt(e.amount)+'</td><td><button class="btn d s" data-edel="'+esc(e.id)+'" type="button">Supprimer</button></td></tr>'}).join("")+'</tbody></table></div>':'<p class="note">Aucune dépense ce mois-ci.</p>');
+}
+
+/* ---------- Outils : numéros bloqués, codes promo, administrateurs ---------- */
+async function loadTools(){
+  await loadBlocked();
+  var p=await sb.from("promo_codes").select("*").order("created_at",{ascending:false});
+  toolsMissing.promo=missingTbl(p.error); promos=p.error?[]:(p.data||[]);
+  var a=await sb.from("admins").select("email,role");
+  if(a.error){ adminsHasRole=false; a=await sb.from("admins").select("email") } else adminsHasRole=true;
+  adminsList=a.error?[]:(a.data||[]);
+}
+function toolsSkeleton(){
+  $("tab-tools").innerHTML='<div id="toolsNotice"></div>'+
+    '<h2>Numéros bloqués</h2><div class="card" style="margin-bottom:14px"><p class="note" style="margin-top:0">Ces numéros sont signalés dans les commandes. Pour qu\'ils soient refusés directement sur le site, le site doit appeler la fonction <b>is_blocked</b> (voir kbine-setup.sql).</p><div class="bar"><input type="tel" id="bPhone" placeholder="Numéro (ex. 0707070707)" style="flex:1;min-width:150px"><input type="text" id="bReason" placeholder="Motif (facultatif)" style="flex:1;min-width:150px"><button class="btn s" id="bAdd" type="button">Bloquer</button></div><div id="bList"></div></div>'+
+    '<h2>Codes promo et remises</h2><div class="card" style="margin-bottom:14px"><div class="stats"><div><label for="pCode">Code</label><input id="pCode" type="text" maxlength="20" placeholder="BIENVENUE10"></div><div><label for="pPct">Remise (%)</label><input id="pPct" type="number" min="1" max="100" value="10"></div><div><label for="pMax">Utilisations max.</label><input id="pMax" type="number" min="1" placeholder="illimité"></div><div><label for="pExp">Expire le</label><input id="pExp" type="date"></div><div><label for="pNote">Note</label><input id="pNote" type="text" maxlength="120"></div></div><p><button class="btn" id="pAdd" type="button">Créer le code</button></p><div id="pList"></div><p class="note">Pour appliquer la remise, le site doit appeler <b>check_promo</b> puis <b>use_promo</b> (voir kbine-setup.sql). Pour offrir un code à un client fidèle, utilisez le bouton « 🎁 Code » dans l\'onglet Clients.</p></div>'+
+    '<h2>Administrateurs</h2><div class="card"><div id="aList"></div><div class="bar"><input type="email" id="aEmail" placeholder="Email du nouvel administrateur" style="flex:1;min-width:180px"><select id="aRole"><option value="staff">Employé (commandes seulement)</option><option value="owner">Propriétaire (tout)</option></select><button class="btn s" id="aAdd" type="button">Ajouter</button></div><p class="note">Créez d\'abord son compte dans Supabase → Authentication → Users (email + mot de passe), puis ajoutez son email ici.</p></div>';
+  $("bAdd").onclick=addBlocked; $("pAdd").onclick=addPromo; $("aAdd").onclick=addAdmin;
+  $("tab-tools").onclick=async function(e){
+    var b=e.target.closest("[data-bdel]"); if(b){ if(!confirm("Débloquer ce numéro ?")) return; var r=await sb.from("blocked_numbers").delete().eq("phone",b.dataset.bdel); if(r.error){ setupToast(r.error); return } await loadBlocked(); renderToolsDyn(); return }
+    var t=e.target.closest("[data-ptoggle]"); if(t){ var pr=promos.filter(function(x){return x.code===t.dataset.ptoggle})[0]; if(!pr) return; var r2=await sb.from("promo_codes").update({active:!pr.active}).eq("code",pr.code); if(r2.error){ setupToast(r2.error); return } await loadTools(); renderToolsDyn(); return }
+    var d=e.target.closest("[data-pdel]"); if(d){ if(!confirm("Supprimer ce code ?")) return; var r3=await sb.from("promo_codes").delete().eq("code",d.dataset.pdel); if(r3.error){ setupToast(r3.error); return } await loadTools(); renderToolsDyn(); return }
+    var a=e.target.closest("[data-adel]"); if(a){ if(!confirm("Retirer cet administrateur ?")) return; var r4=await sb.from("admins").delete().eq("email",a.dataset.adel); if(r4.error){ toast("Erreur : "+r4.error.message); return } await loadTools(); renderToolsDyn() }
+  };
+}
+async function addBlocked(){
+  var n=norm($("bPhone").value); if(n.length<8){ toast("Numéro invalide"); return }
+  var r=await sb.from("blocked_numbers").insert({phone:n,reason:$("bReason").value.trim()||null});
+  if(r.error){ setupToast(r.error); return }
+  $("bPhone").value=""; $("bReason").value=""; toast("Numéro bloqué");
+  await loadBlocked(); renderToolsDyn(); renderCurrent();
+}
+async function addPromo(){
+  var code=$("pCode").value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g,""), pct=Math.round(+$("pPct").value);
+  if(code.length<3){ toast("Code trop court (3 caractères minimum)"); return }
+  if(!(pct>=1&&pct<=100)){ toast("Remise entre 1 et 100 %"); return }
+  var row={code:code,percent:pct,active:true,note:$("pNote").value.trim()||null};
+  if($("pMax").value!=="") row.max_uses=Math.max(1,Math.round(+$("pMax").value));
+  if($("pExp").value) row.expires_on=$("pExp").value;
+  var r=await sb.from("promo_codes").insert(row);
+  if(r.error){ toast(/duplicate|unique/i.test(r.error.message)?"Ce code existe déjà":(missingTbl(r.error)?"Exécutez d'abord kbine-setup.sql dans Supabase":"Erreur : "+r.error.message)); return }
+  $("pCode").value=""; $("pNote").value=""; $("pMax").value=""; $("pExp").value=""; toast("Code créé");
+  await loadTools(); renderToolsDyn();
+}
+async function addAdmin(){
+  var em=$("aEmail").value.trim().toLowerCase(); if(!/^\S+@\S+\.\S+$/.test(em)){ toast("Email invalide"); return }
+  var row={email:em}; if(adminsHasRole) row.role=$("aRole").value;
+  var r=await sb.from("admins").insert(row);
+  if(r.error){ toast("Erreur : "+r.error.message); return }
+  $("aEmail").value=""; toast("Administrateur ajouté");
+  await loadTools(); renderToolsDyn();
+}
+function renderTools(){
+  if(!toolsBuilt){ toolsSkeleton(); toolsBuilt=true; loadTools().then(renderToolsDyn); renderToolsDyn(); return }
+  renderToolsDyn();
+}
+function renderToolsDyn(){
+  if(!$("bList")) return;
+  $("toolsNotice").innerHTML=(toolsMissing.blocked||toolsMissing.promo)?SETUP_MSG:"";
+  var bl=Object.keys(blocked).map(function(k){return blocked[k]});
+  $("bList").innerHTML=bl.length?'<div class="tablewrap"><table class="dt"><thead><tr><th>Numéro</th><th>Motif</th><th class="r">Commandes</th><th>Ajouté le</th><th></th></tr></thead><tbody>'+
+    bl.map(function(b){var n=norm(b.phone); return '<tr><td><b>'+esc(b.phone)+'</b></td><td class="cut">'+esc(b.reason||"")+'</td><td class="r">'+orders.filter(function(o){return norm(o.phone)===n||norm(o.dest_phone)===n}).length+'</td><td>'+esc(b.created_at?fdate(b.created_at):"")+'</td><td><button class="btn g s" data-bdel="'+esc(b.phone)+'" type="button">Débloquer</button></td></tr>'}).join("")+'</tbody></table></div>':'<p class="note">Aucun numéro bloqué.</p>';
+  $("pList").innerHTML=promos.length?'<div class="tablewrap"><table class="dt"><thead><tr><th>Code</th><th class="r">Remise</th><th class="r">Utilisé</th><th>Expire</th><th>Note</th><th></th></tr></thead><tbody>'+
+    promos.map(function(p){return '<tr><td><b>'+esc(p.code)+'</b> '+(p.active?'<span class="chip"><b>actif</b></span>':'<span class="chip">désactivé</span>')+'</td><td class="r">'+p.percent+' %</td><td class="r">'+(p.uses||0)+(p.max_uses?' / '+p.max_uses:'')+'</td><td>'+esc(p.expires_on?frDay(p.expires_on):"—")+'</td><td class="cut">'+esc(p.note||"")+'</td><td><button class="btn g s" data-ptoggle="'+esc(p.code)+'" type="button">'+(p.active?"Désactiver":"Activer")+'</button> <button class="btn d s" data-pdel="'+esc(p.code)+'" type="button">Supprimer</button></td></tr>'}).join("")+'</tbody></table></div>':'<p class="note">Aucun code promo.</p>';
+  $("aList").innerHTML=(adminsList.length?'<div class="tablewrap"><table class="dt"><thead><tr><th>Email</th><th>Rôle</th><th></th></tr></thead><tbody>'+
+    adminsList.map(function(a){var me=String(a.email||"").toLowerCase()===myEmail; return '<tr><td>'+esc(a.email)+(me?' <span class="chip">vous</span>':'')+'</td><td>'+esc(adminsHasRole?(a.role==="staff"?"Employé":"Propriétaire"):"—")+'</td><td>'+(me?'':'<button class="btn d s" data-adel="'+esc(a.email)+'" type="button">Retirer</button>')+'</td></tr>'}).join("")+'</tbody></table></div>':'<p class="note">Liste indisponible.</p>')+
+    (adminsHasRole?'':'<p class="note">Les rôles ne sont pas encore actifs : exécutez kbine-setup.sql dans Supabase.</p>');
+}
+
+/* ---------- Clients : code promo fidélité ---------- */
+async function giftCode(c){
+  var A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789", s="", i;
+  for(i=0;i<4;i++) s+=A.charAt(Math.floor(Math.random()*A.length));
+  var code="FIDELE"+s, name=c.name||"";
+  var r=await sb.from("promo_codes").insert({code:code,percent:10,active:true,max_uses:1,note:"Fidélité "+(name||c.email||c.lastPhone||"")});
+  if(r.error){ setupToast(r.error); return }
+  var msg="Bonjour"+(name?" "+name:"")+", merci pour votre fidélité ! 🎁 Voici votre code promo K-Bine CI : "+code+" (10 % de remise sur votre prochaine commande).";
+  var wa=waNum(c.lastPhone);
+  openModal('<h2 style="margin:4px 0">Code créé 🎁</h2><div class="card flat" style="text-align:center;font-size:1.4rem;font-weight:900;letter-spacing:.08em">'+esc(code)+'</div><div class="card flat note" style="white-space:pre-wrap">'+esc(msg)+'</div><div class="row">'+(wa?'<a class="btn wa" data-close target="_blank" rel="noopener" href="https://wa.me/'+wa+'?text='+encodeURIComponent(msg)+'">Envoyer par WhatsApp</a>':'')+'<button class="btn g s" data-close type="button">Fermer</button></div>');
+  toolsBuilt&&loadTools();
+}
+$("tab-clients").addEventListener("click",function(e){
+  var g=e.target.closest("[data-gift]"); if(!g) return;
+  var c=clientList[+g.dataset.gift]; if(c) giftCode(c);
 });
 
 if("serviceWorker" in navigator){ window.addEventListener("load",function(){ navigator.serviceWorker.register("sw.js").catch(function(){}) }) }
