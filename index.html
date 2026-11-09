@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#1d8a3c">
+<meta name="theme-color" content="#0f3d22">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="KB Admin">
@@ -13,68 +13,157 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>K-Bine CI · Administration</title>
 <style>
-:root{--bg:#f6f8f4;--surface:#fff;--fg:#14231a;--muted:#5b6b60;--line:#dfe6dc;--green:#1d8a3c;--green-ink:#fff;--orange:#f07d00;--soft:#e4f3e8;--osoft:#fff1de;--danger:#b3261e;--dsoft:#fde8e6;color-scheme:light}
-@media (prefers-color-scheme:dark){:root{--bg:#0f1912;--surface:#18271d;--fg:#eef4ee;--muted:#9db0a2;--line:#2a3d2f;--green:#3fbf62;--green-ink:#07210f;--orange:#ff9a2e;--soft:#1b3523;--osoft:#3a2a12;--danger:#ff8a80;--dsoft:#3b1f1c;color-scheme:dark}}
+:root{--bg:#f2f5f1;--surface:#fff;--surface2:#f7faf6;--fg:#14231a;--muted:#5b6b60;--line:#e1e8de;--green:#1d8a3c;--green-ink:#fff;--orange:#f07d00;--soft:#e4f3e8;--osoft:#fff1de;--danger:#b3261e;--dsoft:#fde8e6;--blue:#1b5fa8;--bsoft:#e3eefb;--side:#0f3d22;--side-fg:#d6ebdc;--shadow:0 1px 2px rgba(15,40,25,.06),0 6px 20px rgba(15,40,25,.05);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0c150f;--surface:#15231a;--surface2:#1a2b20;--fg:#eef4ee;--muted:#9db0a2;--line:#27392c;--green:#3fbf62;--green-ink:#07210f;--orange:#ff9a2e;--soft:#1b3523;--osoft:#3a2a12;--danger:#ff8a80;--dsoft:#3b1f1c;--blue:#8cc0ff;--bsoft:#182a40;--side:#08110b;--side-fg:#b9d3c0;--shadow:0 1px 2px rgba(0,0,0,.4);color-scheme:dark}}
+:root[data-theme=dark]{--bg:#0c150f;--surface:#15231a;--surface2:#1a2b20;--fg:#eef4ee;--muted:#9db0a2;--line:#27392c;--green:#3fbf62;--green-ink:#07210f;--orange:#ff9a2e;--soft:#1b3523;--osoft:#3a2a12;--danger:#ff8a80;--dsoft:#3b1f1c;--blue:#8cc0ff;--bsoft:#182a40;--side:#08110b;--side-fg:#b9d3c0;--shadow:0 1px 2px rgba(0,0,0,.4);color-scheme:dark}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;padding:0 max(14px,env(safe-area-inset-left)) 40px}
-.wrap{max-width:900px;margin:0 auto}
-h1{font-size:1.3rem;margin:0}h1 span{color:var(--orange)}
-h2{font-size:1.1rem;margin:18px 0 8px}
-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 0 8px}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:14.5px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+h1{font-size:1.25rem;margin:0}h1 span{color:var(--orange)}
+h2{font-size:1rem;margin:0 0 10px}
+h3{font-size:.95rem;margin:0 0 8px}
 button,input,select,textarea{font:inherit;color:inherit}
-.btn{border:0;background:var(--green);color:var(--green-ink);font-weight:700;padding:9px 14px;border-radius:10px;cursor:pointer}
+.btn{border:0;background:var(--green);color:var(--green-ink);font-weight:700;padding:9px 14px;border-radius:10px;cursor:pointer;transition:transform .08s,opacity .15s}
+.btn:active{transform:scale(.97)}
 .btn.o{background:var(--orange);color:#1b1100}.btn.g{background:var(--surface);color:var(--fg);border:1.5px solid var(--line)}.btn.d{background:var(--dsoft);color:var(--danger)}
-.btn.s{padding:6px 10px;font-size:.82rem;border-radius:8px}
+.btn.s{padding:6px 10px;font-size:.8rem;border-radius:8px}
 .btn:disabled{opacity:.5;cursor:default}
 input,select,textarea{width:100%;padding:9px 11px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface)}
-label{display:block;font-weight:700;font-size:.85rem;margin:10px 0 4px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
-.login{max-width:380px;margin:12vh auto 0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--green);outline-offset:1px}
+label{display:block;font-weight:700;font-size:.82rem;margin:10px 0 4px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.card.flat{box-shadow:none}
+.login{max-width:380px;margin:12vh auto 0;padding:24px}
+.login-brand{display:flex;align-items:center;gap:10px;margin-bottom:6px}
 .err{color:var(--danger);font-size:.88rem;margin:8px 0 0}
 .note{color:var(--muted);font-size:.82rem}
-nav{display:flex;gap:6px;overflow-x:auto;position:sticky;top:0;background:var(--bg);padding:6px 0;z-index:5}
-nav button{flex:none;border:1.5px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:999px;cursor:pointer;font-weight:600}
-nav button[aria-selected=true]{background:var(--soft);border-color:var(--green);font-weight:800}
-nav .n{background:var(--orange);color:#1b1100;border-radius:999px;padding:0 7px;margin-left:6px;font-size:.78rem}
-.bar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.bar>*{width:auto}.bar input[type=search]{flex:1;min-width:150px}
-.order{display:grid;gap:6px;margin-bottom:10px}
+[hidden]{display:none!important}
+
+/* Layout */
+.app{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;height:100vh;background:var(--side);color:var(--side-fg);padding:18px 12px;display:flex;flex-direction:column;gap:22px}
+.brand{display:flex;align-items:center;gap:10px;padding:0 6px}
+.logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--green),var(--orange));display:grid;place-items:center;font-weight:900;color:#fff;font-size:1.1rem}
+.brand b{display:block;color:#fff}.brand small{opacity:.7}
+#tabs{display:flex;flex-direction:column;gap:4px}
+#tabs button{display:flex;align-items:center;gap:10px;border:0;background:transparent;color:inherit;padding:11px 12px;border-radius:11px;cursor:pointer;font-weight:600;text-align:left}
+#tabs button .ic{font-size:1.1rem;width:22px;text-align:center}
+#tabs button:hover{background:rgba(255,255,255,.07)}
+#tabs button[aria-selected=true]{background:rgba(255,255,255,.14);color:#fff;font-weight:800}
+#tabs .n{margin-left:auto;background:var(--orange);color:#1b1100;border-radius:999px;padding:0 8px;font-size:.75rem;font-weight:800}
+.sidefoot{margin-top:auto;font-size:.78rem;opacity:.75;padding:0 8px}
+main{padding:18px 24px 60px;min-width:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.topbar .sub{color:var(--muted);font-size:.82rem}
+.live{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:6px;box-shadow:0 0 0 0 rgba(29,138,60,.6)}
+@media (prefers-reduced-motion:no-preference){.live{animation:pulse 2s infinite}}
+@keyframes pulse{70%{box-shadow:0 0 0 7px rgba(29,138,60,0)}100%{box-shadow:0 0 0 0 rgba(29,138,60,0)}}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;align-items:center}.bar>*{width:auto}.bar input[type=search]{flex:1;min-width:150px}
+.bar input[type=date]{min-width:0}
+.seg{display:inline-flex;background:var(--surface);border:1.5px solid var(--line);border-radius:11px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--green);color:var(--green-ink)}
+
+/* Grilles */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
+.kpi{display:flex;flex-direction:column;gap:2px;position:relative;padding:14px}
+.kpi .lab{color:var(--muted);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.kpi b{font-size:1.45rem;line-height:1.2}
+.kpi .ico{position:absolute;right:12px;top:12px;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--soft);font-size:1.05rem}
+.kpi.o .ico{background:var(--osoft)}.kpi.b .ico{background:var(--bsoft)}
+.delta{display:inline-block;font-size:.74rem;font-weight:800;padding:1px 7px;border-radius:999px;margin-top:2px;width:fit-content}
+.delta.up{background:var(--soft);color:var(--green)}.delta.down{background:var(--dsoft);color:var(--danger)}
+.g{display:grid;gap:14px;margin-bottom:14px}
+.g21{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+.g11{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+@media(max-width:900px){.g21,.g11{grid-template-columns:minmax(0,1fr)}}
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.chart .gl{stroke:var(--line);stroke-width:1}
+.chart .ax{fill:var(--muted);font-size:10px}
+.chart .hit{fill:transparent}.chart .hit:hover{fill:rgba(127,127,127,.12)}
+.chart .big{font-size:20px;font-weight:800;fill:var(--fg)}.chart .small{font-size:9px;fill:var(--muted)}
+.donutwrap{display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center}
+.donutwrap svg{width:150px;height:150px;flex:none}
+.legend{list-style:none;margin:0;padding:0;display:grid;gap:5px;font-size:.84rem;flex:1;min-width:130px}
+.legend li{display:flex;align-items:center;gap:7px}.legend i{width:10px;height:10px;border-radius:3px;flex:none}
+.legend span{margin-left:auto;color:var(--muted)}
+.hb{display:grid;gap:9px}
+.hb .r{display:grid;gap:3px}
+.hb .t{display:flex;justify-content:space-between;gap:8px;font-size:.84rem}.hb .t span{color:var(--muted);white-space:nowrap}
+.hb .trk{height:9px;background:var(--surface2);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.hb .trk i{display:block;height:100%;border-radius:99px;background:var(--green)}
+#tip{position:fixed;z-index:90;background:var(--fg);color:var(--bg);padding:5px 10px;border-radius:8px;font-size:.78rem;font-weight:700;pointer-events:none;max-width:260px}
+
+/* Tableaux */
+.tablewrap{overflow:auto;max-width:100%;border-radius:12px}
+table.dt{width:100%;border-collapse:collapse;font-size:.85rem}
+table.dt th,table.dt td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.dt th{color:var(--muted);font-weight:800;font-size:.76rem;text-transform:uppercase;letter-spacing:.03em;background:var(--surface2);position:sticky;top:0;z-index:1}
+table.dt th[data-sort]{cursor:pointer;user-select:none}
+table.dt th[data-sort]:hover{color:var(--fg)}
+table.dt tbody tr:hover{background:var(--surface2)}
+table.dt tr[data-id]{cursor:pointer}
+table.dt td.r,table.dt th.r{text-align:right}
+table.dt td.wrap{white-space:normal;min-width:160px}
+table.dt td.cut{max-width:260px;overflow:hidden;text-overflow:ellipsis}
+table.dt input[type=checkbox]{width:18px;height:18px;padding:0}
+.pager{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:10px;flex-wrap:wrap}
+.chip{display:inline-block;padding:2px 9px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);font-size:.74rem;margin:2px 4px 2px 0}
+.chip b{color:var(--green)}
+
+/* Commandes */
+.order{display:grid;gap:8px;margin-bottom:10px}
 .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;flex-wrap:wrap}
 .top b{font-size:1rem}
-.badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.78rem;font-weight:800}
-.st-paid_declared{background:var(--osoft);color:var(--orange)}.st-delivered{background:var(--soft);color:var(--green)}.st-rejected{background:var(--dsoft);color:var(--danger)}
-.st-verified{background:#e3eefb;color:#1b5fa8}
-@media (prefers-color-scheme:dark){.st-verified{background:#182a40;color:#8cc0ff}}
+.badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.76rem;font-weight:800}
+.st-paid_declared{background:var(--osoft);color:var(--orange)}.st-delivered{background:var(--soft);color:var(--green)}.st-rejected{background:var(--dsoft);color:var(--danger)}.st-verified{background:var(--bsoft);color:var(--blue)}
+.age{display:inline-block;font-size:.74rem;font-weight:800;padding:1px 8px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);color:var(--muted)}
+.age.warn{background:var(--osoft);color:var(--orange);border-color:transparent}.age.late{background:var(--dsoft);color:var(--danger);border-color:transparent}
+.opdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2px 16px;font-size:.88rem}
+.kv span{color:var(--muted)}
 .btn.wa{background:#25d366;color:#06220f;text-decoration:none;display:inline-block}
+#bulkBar{position:sticky;top:8px;z-index:6;background:var(--fg);color:var(--bg);border-radius:12px;padding:8px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
+#bulkBar .btn{background:var(--bg);color:var(--fg)}
 #alertBar{position:fixed;left:0;right:0;top:0;z-index:70;background:var(--orange);color:#1b1100;padding:10px max(14px,env(safe-area-inset-left));box-shadow:0 8px 24px rgba(0,0,0,.35);display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 #alertBar b{font-size:1rem}
 #alertBar .btn{background:#1b1100;color:#fff}
 #alertBar .bell{display:inline-block}
 @keyframes ring{0%,100%{transform:rotate(0)}20%{transform:rotate(-14deg)}40%{transform:rotate(14deg)}60%{transform:rotate(-8deg)}80%{transform:rotate(8deg)}}
 @media (prefers-reduced-motion:no-preference){#alertBar .bell{animation:ring 1s ease-in-out infinite}}
-.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2px 16px;font-size:.88rem}
-.kv span{color:var(--muted)}
-.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.stat b{display:block;font-size:1.4rem;color:var(--green)}.stat span{color:var(--muted);font-size:.82rem}
-table{width:100%;border-collapse:collapse;font-size:.88rem}th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:700}
-td.r,th.r{text-align:right}
+
+/* Prix */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
 .prow{display:grid;grid-template-columns:1fr 110px auto auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
 .prow .nm small{display:block;color:var(--muted)}
 .prow input[type=checkbox]{width:20px;height:20px}
-.prow.mod{background:var(--osoft);margin:0 -8px;padding:8px}
+.prow.mod{background:var(--osoft);margin:0 -8px;padding:8px;border-radius:8px}
 @media(max-width:560px){.prow{grid-template-columns:1fr 90px auto}.prow .rs{grid-column:1/-1}}
+
 .modal{position:fixed;inset:0;background:rgba(5,15,8,.7);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
-.modal .in{background:var(--surface);border-radius:14px;padding:12px;max-width:520px;width:100%;max-height:92vh;overflow:auto;display:grid;gap:10px}
+#modal2{z-index:55}
+.modal .in{background:var(--surface);border-radius:16px;padding:14px;max-width:560px;width:100%;max-height:92vh;overflow:auto;display:grid;gap:10px}
 .modal img{width:100%;border-radius:10px}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:999px;font-weight:700;z-index:60}
-[hidden]{display:none!important}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:999px;font-weight:700;z-index:95}
+
+/* Mobile : menu en bas */
+@media(max-width:820px){
+  .app{display:block}
+  .side{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;flex-direction:row;padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:40;gap:0;box-shadow:0 -6px 20px rgba(0,0,0,.25)}
+  .brand,.sidefoot{display:none}
+  #tabs{flex-direction:row;width:100%}
+  #tabs button{flex:1;flex-direction:column;gap:2px;padding:6px 2px;font-size:.68rem;justify-content:center;align-items:center;text-align:center;position:relative}
+  #tabs .n{position:absolute;top:0;right:14%;margin:0;padding:0 6px}
+  main{padding:12px 12px 100px}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
 
 <section id="loginView" class="login card" hidden>
-  <h1>K-Bine <span>CI</span> · Admin</h1>
+  <div class="login-brand"><div class="logo">K</div><h1>K-Bine <span>CI</span> · Admin</h1></div>
   <p class="note">Accès réservé à l'administrateur.</p>
   <form id="loginForm">
     <label for="em">Email</label><input id="em" type="email" autocomplete="username" required>
@@ -85,56 +174,119 @@ td.r,th.r{text-align:right}
 </section>
 
 <section id="appView" hidden>
-  <header>
-    <h1>K-Bine <span>CI</span> · Admin</h1>
-    <div class="row"><button class="btn g s" id="soundBtn" type="button" aria-pressed="true">🔔 Son activé</button><button class="btn g s" id="refreshBtn" type="button">Actualiser</button><button class="btn g s" id="logoutBtn" type="button">Déconnexion</button></div>
-  </header>
-  <nav id="tabs" role="tablist">
-    <button data-t="orders" aria-selected="true">Commandes<span class="n" id="pendN" hidden>0</span></button>
-    <button data-t="stats" aria-selected="false">Statistiques</button>
-    <button data-t="prices" aria-selected="false">Prix</button>
-    <button data-t="clients" aria-selected="false">Clients</button>
-  </nav>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><div class="logo">K</div><div><b>K-Bine CI</b><small>Administration</small></div></div>
+    <nav id="tabs" role="tablist">
+      <button data-t="dash" aria-selected="true"><span class="ic">📊</span>Tableau de bord</button>
+      <button data-t="orders" aria-selected="false"><span class="ic">🧾</span>Commandes<span class="n" id="pendN" hidden>0</span></button>
+      <button data-t="clients" aria-selected="false"><span class="ic">👥</span>Clients</button>
+      <button data-t="prices" aria-selected="false"><span class="ic">🏷️</span>Prix</button>
+      <button data-t="db" aria-selected="false"><span class="ic">🗄️</span>Base de données</button>
+    </nav>
+    <div class="sidefoot"><span class="live"></span><span id="syncInfo">Connexion…</span></div>
+  </aside>
 
-  <div id="tab-orders">
-    <div class="bar">
-      <select id="fStatus"><option value="todo" selected>À traiter</option><option value="paid_declared">À vérifier</option><option value="verified">Vérifiées (à livrer)</option><option value="delivered">Livrées</option><option value="rejected">Refusées</option><option value="all">Tous les statuts</option></select>
-      <select id="fOp"><option value="all">Tous réseaux</option><option value="orange">Orange</option><option value="mtn">MTN</option><option value="moov">Moov</option></select>
-      <input type="search" id="fQ" placeholder="Rechercher : numéro, référence, email, forfait">
-      <button class="btn g s" id="csvBtn" type="button">Exporter CSV</button>
-    </div>
-    <div id="orderList"></div>
-  </div>
-
-  <div id="tab-stats" hidden></div>
-
-  <div id="tab-prices" hidden>
-    <h2>Frais et règles</h2>
-    <div class="card">
-      <div class="stats">
-        <div><label for="sFee">Frais fixes des pass (F CFA)</label><input id="sFee" type="number" min="0"></div>
-        <div><label for="sFrom">Pass « chers » : à partir de (F CFA)</label><input id="sFrom" type="number" min="0" placeholder="2000"></div>
-        <div><label for="sPct">Frais des pass chers (ex. 0.10 = 10 %)</label><input id="sPct" type="number" step="0.01" min="0" placeholder="0.10"></div>
-        <div><label for="sRate">Frais transfert (ex. 0.10 = 10 %)</label><input id="sRate" type="number" step="0.01" min="0"></div>
-        <div><label for="sMin">Transfert minimum (F CFA)</label><input id="sMin" type="number" min="0"></div>
+  <main>
+    <div class="topbar">
+      <div><h1 id="pageTitle">Tableau de bord</h1><div class="sub" id="pageSub"></div></div>
+      <div class="row">
+        <button class="btn g s" id="soundBtn" type="button" aria-pressed="true">🔔 Son activé</button>
+        <button class="btn g s" id="testBtn" type="button">▶ Tester le son</button>
+        <button class="btn g s" id="themeBtn" type="button">🌓 Auto</button>
+        <button class="btn g s" id="refreshBtn" type="button">Actualiser</button>
+        <button class="btn g s" id="logoutBtn" type="button">Déconnexion</button>
       </div>
-      <p class="note">Un pass dont le prix dépasse le seuil paie le pourcentage (ex. 3 000 F → 300 F de frais). Les autres paient les frais fixes.</p>
-      <p><button class="btn" id="saveSettings" type="button">Enregistrer les frais</button></p>
     </div>
-    <h2>Prix des pass</h2>
-    <div class="bar"><select id="pOp"><option value="orange">Orange</option><option value="mtn">MTN</option><option value="moov">Moov</option></select><input type="search" id="pQ" placeholder="Filtrer les pass"></div>
-    <p class="note">Modifiez un prix ou décochez « Dispo » pour masquer un pass sur le site. Les changements sont visibles sur le site dès le prochain chargement.</p>
-    <div class="card" id="priceList"></div>
-  </div>
 
-  <div id="tab-clients" hidden></div>
-</section>
+    <!-- Tableau de bord -->
+    <div id="tab-dash">
+      <div class="bar">
+        <div class="seg" id="rangeSeg" role="group" aria-label="Période">
+          <button data-r="7" aria-pressed="false">7 j</button>
+          <button data-r="30" aria-pressed="true">30 j</button>
+          <button data-r="90" aria-pressed="false">90 j</button>
+          <button data-r="0" aria-pressed="false">Tout</button>
+        </div>
+        <span class="note" id="rangeNote"></span>
+      </div>
+      <div id="dashBody"></div>
+    </div>
+
+    <!-- Commandes -->
+    <div id="tab-orders" hidden>
+      <div class="bar">
+        <select id="fStatus"><option value="todo" selected>À traiter</option><option value="paid_declared">À vérifier</option><option value="verified">Vérifiées (à livrer)</option><option value="delivered">Livrées</option><option value="rejected">Refusées</option><option value="all">Tous les statuts</option></select>
+        <select id="fOp"><option value="all">Tous réseaux</option><option value="orange">Orange</option><option value="mtn">MTN</option><option value="moov">Moov</option></select>
+        <select id="fKind"><option value="all">Tous types</option><option value="sub">Souscriptions</option><option value="tf">Transferts</option></select>
+        <select id="fSort"><option value="new">Plus récentes</option><option value="old">Plus anciennes</option><option value="high">Montant ↓</option><option value="low">Montant ↑</option></select>
+      </div>
+      <div class="bar">
+        <input type="search" id="fQ" placeholder="Rechercher : numéro, référence, email, forfait, client">
+        <label style="margin:0;display:flex;align-items:center;gap:5px" class="note">Du <input type="date" id="fFrom" aria-label="Du"></label>
+        <label style="margin:0;display:flex;align-items:center;gap:5px" class="note">au <input type="date" id="fTo" aria-label="Au"></label>
+        <div class="seg" id="viewSeg"><button data-v="cards" aria-pressed="true">Cartes</button><button data-v="table" aria-pressed="false">Tableau</button></div>
+        <button class="btn g s" id="csvBtn" type="button">Exporter CSV</button>
+      </div>
+      <div class="note" id="ordCount" style="margin:2px 0 8px"></div>
+      <div id="bulkBar" hidden><b><span data-n>0</span> sélectionnée(s)</b>
+        <button class="btn s" data-bulk="verified" type="button">Paiement vérifié</button>
+        <button class="btn s" data-bulk="delivered" type="button">Livrées</button>
+        <button class="btn s" data-bulk="rejected" type="button">Refuser</button>
+        <button class="btn s" data-bulk="clear" type="button">Annuler</button></div>
+      <div id="orderList"></div>
+    </div>
+
+    <!-- Clients -->
+    <div id="tab-clients" hidden></div>
+
+    <!-- Prix -->
+    <div id="tab-prices" hidden>
+      <h2>Frais et règles</h2>
+      <div class="card">
+        <div class="stats">
+          <div><label for="sFee">Frais fixes des pass (F CFA)</label><input id="sFee" type="number" min="0"></div>
+          <div><label for="sFrom">Pass « chers » : à partir de (F CFA)</label><input id="sFrom" type="number" min="0" placeholder="2000"></div>
+          <div><label for="sPct">Frais des pass chers (ex. 0.10 = 10 %)</label><input id="sPct" type="number" step="0.01" min="0" placeholder="0.10"></div>
+          <div><label for="sRate">Frais transfert (ex. 0.10 = 10 %)</label><input id="sRate" type="number" step="0.01" min="0"></div>
+          <div><label for="sMin">Transfert minimum (F CFA)</label><input id="sMin" type="number" min="0"></div>
+        </div>
+        <p class="note">Un pass dont le prix dépasse le seuil paie le pourcentage (ex. 3 000 F → 300 F de frais). Les autres paient les frais fixes.</p>
+        <p><button class="btn" id="saveSettings" type="button">Enregistrer les frais</button></p>
+      </div>
+      <h2 style="margin-top:18px">Prix des pass</h2>
+      <div class="bar"><select id="pOp"><option value="orange">Orange</option><option value="mtn">MTN</option><option value="moov">Moov</option></select><input type="search" id="pQ" placeholder="Filtrer les pass"></div>
+      <p class="note" id="pSummary">Modifiez un prix ou décochez « Dispo » pour masquer un pass sur le site. Les changements sont visibles sur le site dès le prochain chargement.</p>
+      <div class="card" id="priceList"></div>
+    </div>
+
+    <!-- Base de données -->
+    <div id="tab-db" hidden>
+      <div class="card flat" style="margin-bottom:12px">
+        <div class="bar" style="margin-top:0">
+          <select id="dbTable"><option value="orders">orders (commandes)</option><option value="price_overrides">price_overrides (prix)</option><option value="settings">settings (frais)</option><option value="admins">admins</option></select>
+          <input type="search" id="dbQ" placeholder="Filtrer les lignes">
+          <button class="btn g s" id="dbReload" type="button">Recharger</button>
+          <button class="btn g s" id="dbCsv" type="button">CSV</button>
+          <button class="btn g s" id="dbJson" type="button">JSON</button>
+          <button class="btn o s" id="dbBackup" type="button">Sauvegarde complète</button>
+        </div>
+        <div id="dbInfo" class="note"></div>
+        <div id="dbSchema"></div>
+      </div>
+      <div class="card flat"><div class="tablewrap" style="max-height:62vh" id="dbTableWrap"></div><div class="pager" id="dbPager"></div></div>
+    </div>
+  </main>
 </div>
+</section>
 
 <div id="alertBar" role="alert" hidden></div>
 <div class="modal" id="modal" hidden><div class="in" id="modalIn"></div></div>
+<div class="modal" id="modal2" hidden><div class="in" id="modalIn2"></div></div>
+<div id="tip" hidden></div>
 
 <script src="config.js"></script>
+<script src="kbsound.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 (function(){
@@ -143,8 +295,26 @@ var $ = function(id){return document.getElementById(id)};
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function fmt(n){return String(Math.round(n||0)).replace(/\B(?=(\d{3})+(?!\d))/g," ")+" F"}
 function fdate(d){return new Date(d).toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"})}
+function fd(d){return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")}
 function toast(t){var e=document.createElement("div");e.className="toast";e.textContent=t;document.body.appendChild(e);setTimeout(function(){e.remove()},1800)}
+function short(n){n=Math.round(n);if(n>=1e6)return (n/1e6).toFixed(1).replace(".0","")+"M";if(n>=1e3)return (n/1e3).toFixed(n>=1e4?0:1).replace(".0","")+"k";return String(n)}
+function sum(a,k){return a.reduce(function(s,o){return s+(+o[k]||0)},0)}
 var OPN={orange:"Orange",mtn:"MTN",moov:"Moov"}, STN={paid_declared:"À vérifier",verified:"Vérifiée",delivered:"Livrée",rejected:"Refusée"};
+var OPC={orange:"#f07d00",mtn:"#f2c200",moov:"#1b6fd1"}, STC={paid_declared:"#f07d00",verified:"#1b5fa8",delivered:"#1d8a3c",rejected:"#b3261e"};
+var TITLES={dash:["Tableau de bord","Vue d'ensemble de l'activité"],orders:["Commandes","Traitez, vérifiez et livrez"],clients:["Clients","Fichier clients et fidélité"],prices:["Prix et frais","Catalogue et règles de frais"],db:["Base de données","Explorer, exporter et sauvegarder les tables"]};
+
+/* ---------- Thème ---------- */
+var theme="auto"; try{ theme=localStorage.getItem("kb_theme")||"auto" }catch(e){}
+function applyTheme(){
+  var r=document.documentElement; if(theme==="auto") r.removeAttribute("data-theme"); else r.setAttribute("data-theme",theme);
+  $("themeBtn").textContent = theme==="dark"?"🌙 Sombre":theme==="light"?"☀️ Clair":"🌓 Auto";
+}
+$("themeBtn").addEventListener("click",function(){
+  theme = theme==="auto"?"light":theme==="light"?"dark":"auto";
+  try{ localStorage.setItem("kb_theme",theme) }catch(e){}
+  applyTheme();
+});
+applyTheme();
 
 if(!window.supabase || !cfg.url || /VOTRE-/.test(cfg.url)){
   $("loginView").hidden=false;
@@ -152,7 +322,19 @@ if(!window.supabase || !cfg.url || /VOTRE-/.test(cfg.url)){
   return;
 }
 var sb = window.supabase.createClient(cfg.url,cfg.key);
-var orders=[], overrides={}, settings={}, catalog=null, curTab="orders", knownIds=null, alertList=[], tick=0;
+var orders=[], overrides={}, settings={}, catalog=null, curTab="dash", knownIds=null, alertList=[], tick=0, lastSync=null;
+var range=30, view="cards", limit=30, selected={};
+
+/* ---------- Infobulle des graphiques ---------- */
+var tip=$("tip");
+function posTip(e){ tip.style.left=Math.max(6,Math.min(e.clientX+12,window.innerWidth-tip.offsetWidth-8))+"px"; tip.style.top=Math.max(6,e.clientY-36)+"px" }
+document.addEventListener("mouseover",function(e){
+  var t=e.target.closest&&e.target.closest("[data-tip]");
+  if(!t){ tip.hidden=true; return }
+  tip.textContent=t.getAttribute("data-tip"); tip.hidden=false; posTip(e);
+});
+document.addEventListener("mousemove",function(e){ if(!tip.hidden) posTip(e) });
+document.addEventListener("scroll",function(){ tip.hidden=true },true);
 
 /* ---------- Nom du client, WhatsApp, alerte sonore ---------- */
 function cname(o){ if(o.customer_name) return String(o.customer_name).trim(); var m=/^Client : (.+?)(?: · |$)/.exec(o.note||""); return m?m[1].trim():"" }
@@ -170,14 +352,65 @@ function waBtn(o){ var l=waLink(o); return l?'<a class="btn wa s" target="_blank
 function promptNotify(o){
   var l=waLink(o);
   if(!l){ toast("Pas de numéro pour prévenir le client"); return }
-  openModal('<h2 style="margin:4px 0">Commande livrée ✔</h2><p class="note" style="margin:0">Prévenez le client : WhatsApp s’ouvre avec le message déjà écrit.</p><div class="card note" style="white-space:pre-wrap">'+esc(deliveredMsg(o))+'</div><div class="row"><a class="btn wa" data-close target="_blank" rel="noopener" href="'+esc(l)+'">Prévenir le client</a><button class="btn g s" data-close type="button">Plus tard</button></div>');
+  openModal('<h2 style="margin:4px 0">Commande livrée ✔</h2><p class="note" style="margin:0">Prévenez le client : WhatsApp s’ouvre avec le message déjà écrit.</p><div class="card flat note" style="white-space:pre-wrap">'+esc(deliveredMsg(o))+'</div><div class="row"><a class="btn wa" data-close target="_blank" rel="noopener" href="'+esc(l)+'">Prévenir le client</a><button class="btn g s" data-close type="button">Plus tard</button></div>');
 }
 
 var soundOn=true, audioCtx=null;
 try{ soundOn = localStorage.getItem("kb_sound")!=="0" }catch(e){}
 function getCtx(){ if(!audioCtx){ var C=window.AudioContext||window.webkitAudioContext; if(C){ try{ audioCtx=new C() }catch(e){} } } return audioCtx }
 function soundReady(){ return !!audioCtx && audioCtx.state==="running" }
-function unlockAudio(){ var c=getCtx(); if(c&&c.state==="suspended"){ try{ c.resume() }catch(e){} } }
+var speechPrimed=false;
+function unlockAudio(){
+  var c=getCtx(); if(c&&c.state==="suspended"){ try{ c.resume() }catch(e){} }
+  if(!speechPrimed){ speechPrimed=true; try{ var u=new SpeechSynthesisUtterance(" "); u.volume=0; window.speechSynthesis.speak(u) }catch(e){} }
+}
+
+/* ---------- Sonnerie : musique de 50 s + son de caisse + voix ---------- */
+var alarm=null, ALARM_SECONDS=50;
+function speak(text){
+  try{
+    var sp=window.speechSynthesis; if(!sp) return;
+    var u=new SpeechSynthesisUtterance(text); u.lang="fr-FR"; u.rate=.95; u.pitch=1; u.volume=1;
+    var fr=sp.getVoices().filter(function(v){return /^fr/i.test(v.lang)});
+    if(fr.length) u.voice=fr.filter(function(v){return /fr[-_]FR/i.test(v.lang)})[0]||fr[0];
+    sp.speak(u);
+  }catch(e){}
+}
+function paintTest(){ var b=$("testBtn"); if(b) b.textContent = alarm ? "■ Arrêter le son" : "▶ Tester le son" }
+function stopAlarm(){
+  if(alarm){
+    try{ var c=getCtx(); alarm.master.gain.cancelScheduledValues(c.currentTime); alarm.master.gain.setTargetAtTime(.0001,c.currentTime,.05);
+         setTimeout(function(m){ try{m.disconnect()}catch(e){} },500,alarm.master) }catch(e){}
+    alarm.timers.forEach(clearTimeout); alarm=null;
+  }
+  try{ window.speechSynthesis.cancel() }catch(e){}
+  paintTest();
+}
+function newOrderAlarm(n){
+  stopAlarm();
+  var c=getCtx(); if(!c||!window.KBSound) return;
+  if(c.state==="suspended"){ try{ c.resume() }catch(e){} }
+  var t=c.currentTime+.1, master=c.createGain(); master.gain.value=.5; master.connect(c.destination);
+  KBSound.music(c,master,t,ALARM_SECONDS);
+  KBSound.cash(c,master,t);
+  KBSound.cash(c,master,t+ALARM_SECONDS-5);
+  var say=n>1 ? n+" nouvelles commandes reçues" : "Nouvelle commande reçue";
+  alarm={master:master,timers:[]};
+  [2200, 25000, (ALARM_SECONDS-3.5)*1000].forEach(function(ms){ alarm.timers.push(setTimeout(function(){ speak(say) },ms)) });
+  alarm.timers.push(setTimeout(function(){ stopAlarm() },ALARM_SECONDS*1000+300));
+  paintTest();
+}
+/* Voix à chaque étape : paiement vérifié, livré, refusé */
+function stepVoice(status){
+  if(!soundOn) return;
+  var c=getCtx();
+  if(c&&c.state==="suspended"){ try{ c.resume() }catch(e){} }
+  try{
+    if(status==="verified"){ if(c&&window.KBSound) KBSound.ding(c,c.destination,c.currentTime+.05); setTimeout(function(){ speak("Paiement vérifié. Vous pouvez livrer la commande.") },900) }
+    else if(status==="delivered"){ if(c&&window.KBSound) KBSound.cash(c,c.destination,c.currentTime+.05); setTimeout(function(){ speak("Commande livrée avec succès. Bravo.") },1700) }
+    else if(status==="rejected"){ speak("Commande refusée.") }
+  }catch(e){}
+}
 function chime(){
   var c=getCtx(); if(!c) return;
   if(c.state==="suspended"){ try{ c.resume() }catch(e){} }
@@ -192,9 +425,11 @@ function paintSound(){ var b=$("soundBtn"); b.textContent=soundOn?"🔔 Son acti
 $("soundBtn").addEventListener("click",function(){
   soundOn=!soundOn; try{ localStorage.setItem("kb_sound",soundOn?"1":"0") }catch(e){}
   paintSound();
+  if(!soundOn) stopAlarm();
   if(soundOn){ unlockAudio(); chime(); try{ if(window.Notification&&Notification.permission==="default") Notification.requestPermission() }catch(e){} }
 });
 document.addEventListener("pointerdown",unlockAudio);
+$("testBtn").addEventListener("click",function(){ if(alarm){ stopAlarm(); return } unlockAudio(); newOrderAlarm(1) });
 paintSound();
 
 function pendingCount(){ return orders.filter(isTodo).length }
@@ -212,7 +447,7 @@ function renderAlert(){
 function raiseAlert(list){
   alertList=alertList.concat(list);
   renderAlert();
-  if(soundOn) chime();
+  if(soundOn) newOrderAlarm(list.length);
   try{ if(navigator.vibrate) navigator.vibrate([250,120,250]) }catch(e){}
   if(document.hidden&&window.Notification&&Notification.permission==="granted"){
     try{ new Notification("Nouvelle commande · K-Bine CI",{body:alertText(list[0])+(list.length>1?" (+"+(list.length-1)+")":"")}) }catch(e){}
@@ -220,7 +455,7 @@ function raiseAlert(list){
 }
 $("alertBar").addEventListener("click",function(e){
   var b=e.target.closest("[data-alert]"); if(!b) return;
-  alertList=[]; renderAlert(); setTitle(pendingCount());
+  alertList=[]; stopAlarm(); renderAlert(); setTitle(pendingCount());
   if(b.dataset.alert==="see"){
     document.querySelector('#tabs [data-t="orders"]').click();
     $("fStatus").value="todo"; renderOrders(); window.scrollTo(0,0);
@@ -238,9 +473,17 @@ async function pollNew(){
   if(r.error||!r.data||knownIds===null) return;
   if(r.data.some(function(x){return !knownIds[x.id]})) loadOrders();
 }
+var watching=false;
 function startWatching(){
+  if(watching) return; watching=true;
   setInterval(function(){ tick++; if(tick%6===0) loadOrders(); else pollNew() },20000);
+  setInterval(function(){ updateAges(); paintSync() },30000);
   try{ sb.channel("kb-orders").on("postgres_changes",{event:"INSERT",schema:"public",table:"orders"},function(){ loadOrders() }).subscribe() }catch(e){}
+}
+function paintSync(){
+  var t=lastSync?lastSync.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}):"…";
+  $("syncInfo").textContent="En direct · maj "+t;
+  if(curTab==="dash") $("pageSub").textContent="Vue d'ensemble · mis à jour à "+t;
 }
 
 /* ---------- Connexion ---------- */
@@ -269,8 +512,10 @@ async function loadOrders(){
   var r = await sb.from("orders").select("*").order("created_at",{ascending:false}).limit(2000);
   if(r.error){ toast("Erreur de chargement"); return }
   orders = r.data||[];
+  var ids={}; orders.forEach(function(o){ids[o.id]=1}); Object.keys(selected).forEach(function(k){ if(!ids[k]) delete selected[k] });
   var p = orders.filter(isTodo).length;
   $("pendN").textContent=p; $("pendN").hidden=!p;
+  lastSync=new Date(); paintSync();
   detectNew();
   setTitle(p);
   renderCurrent();
@@ -298,140 +543,338 @@ async function loadCatalog(){
   return catalog;
 }
 async function refresh(){ await Promise.all([loadOrders(),loadPrices()]); renderCurrent() }
-$("refreshBtn").addEventListener("click",function(){refresh();toast("Actualisé")});
+$("refreshBtn").addEventListener("click",function(){refresh();if(curTab==="db")loadDb();toast("Actualisé")});
 
 /* ---------- Onglets ---------- */
+function goTab(t){
+  curTab=t;
+  [].forEach.call($("tabs").children,function(x){x.setAttribute("aria-selected",x.dataset.t===t)});
+  ["dash","orders","clients","prices","db"].forEach(function(k){$("tab-"+k).hidden=k!==t});
+  $("pageTitle").textContent=TITLES[t][0]; $("pageSub").textContent=TITLES[t][1];
+  if(t==="dash") paintSync();
+  renderCurrent(); window.scrollTo(0,0);
+}
 $("tabs").addEventListener("click",function(e){
   var b=e.target.closest("button[data-t]"); if(!b) return;
-  curTab=b.dataset.t;
-  [].forEach.call($("tabs").children,function(x){x.setAttribute("aria-selected",x===b)});
-  ["orders","stats","prices","clients"].forEach(function(t){$("tab-"+t).hidden=t!==curTab});
-  renderCurrent();
+  goTab(b.dataset.t);
 });
 function renderCurrent(){
-  if(curTab==="orders") renderOrders();
-  else if(curTab==="stats") renderStats();
+  if(curTab==="dash") renderDash();
+  else if(curTab==="orders") renderOrders();
+  else if(curTab==="clients") renderClients();
   else if(curTab==="prices") renderPrices();
-  else renderClients();
+  else if(curTab==="db"&&!dbLoaded) loadDb();
 }
+
+/* ---------- Utilitaires de dates / export ---------- */
+function startOfDay(d){var x=new Date(d);x.setHours(0,0,0,0);return x}
+function dayKey(d){var x=new Date(d);return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0")}
+function fmtAge(m){ if(m<1) return "à l'instant"; if(m<60) return Math.floor(m)+" min"; if(m<1440) return Math.floor(m/60)+" h "+String(Math.floor(m%60)).padStart(2,"0"); return Math.floor(m/1440)+" j" }
+function ageHtml(o){ return isTodo(o)?'<span class="age" data-age="'+(+new Date(o.created_at))+'"></span>':'' }
+function updateAges(){
+  var now=Date.now();
+  [].forEach.call(document.querySelectorAll("[data-age]"),function(el){
+    var m=(now-(+el.dataset.age))/60000;
+    el.textContent="⏱ "+fmtAge(m); el.className="age"+(m>60?" late":m>15?" warn":"");
+  });
+}
+function csv(rows){return rows.map(function(r){return r.map(function(c){c=String(c==null?"":c);return /[",;\n]/.test(c)?'"'+c.replace(/"/g,'""')+'"':c}).join(";")}).join("\n")}
+function dl(name,text,mime){var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([(mime&&mime.indexOf("json")>=0?"":"\ufeff")+text],{type:mime||"text/csv;charset=utf-8"}));a.download=name;document.body.appendChild(a);a.click();a.remove()}
+function download(name,text){dl(name,text,"text/csv;charset=utf-8")}
+
+/* ---------- Graphiques (SVG maison, sans dépendance) ---------- */
+function niceMax(v){ if(v<=0) return 1; var p=Math.pow(10,Math.floor(Math.log(v)/Math.LN10)), m=v/p; return (m<=1?1:m<=2?2:m<=5?5:10)*p }
+function scale(maxv){ var m=niceMax(maxv), t=[]; for(var i=0;i<=4;i++) t.push(m*i/4); return {m:m,t:t} }
+function areaChart(pts,o){
+  var W=640,H=240,L=46,R=12,T=12,B=28,iw=W-L-R,ih=H-T-B,n=pts.length;
+  var sc=scale(Math.max.apply(null,pts.map(function(p){return p.v}).concat([1])));
+  var X=function(i){return L+(n===1?iw/2:i*iw/(n-1))}, Y=function(v){return T+ih*(1-v/sc.m)};
+  var grid=sc.t.map(function(t){return '<line class="gl" x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(t).toFixed(1)+'" y2="'+Y(t).toFixed(1)+'"/><text class="ax" x="'+(L-6)+'" y="'+(Y(t)+3).toFixed(1)+'" text-anchor="end">'+short(t)+'</text>'}).join("");
+  var line=pts.map(function(p,i){return (i?"L":"M")+X(i).toFixed(1)+" "+Y(p.v).toFixed(1)}).join(" ");
+  var area=line+" L"+X(n-1).toFixed(1)+" "+(T+ih)+" L"+X(0).toFixed(1)+" "+(T+ih)+" Z";
+  var every=Math.ceil(n/6), bw=iw/Math.max(n,1);
+  var xl=pts.map(function(p,i){return i%every===0?'<text class="ax" x="'+X(i).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle">'+esc(p.l)+'</text>':''}).join("");
+  var dots=n<=45?pts.map(function(p,i){return '<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(p.v).toFixed(1)+'" r="3" style="fill:var(--surface);stroke:'+o.color+';stroke-width:2"/>'}).join(""):"";
+  var hits=pts.map(function(p,i){return '<rect class="hit" x="'+(X(i)-bw/2).toFixed(1)+'" y="'+T+'" width="'+bw.toFixed(1)+'" height="'+ih+'" data-tip="'+esc(p.t)+'"/>'}).join("");
+  return '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(o.label||"Graphique")+'"><defs><linearGradient id="'+o.id+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:'+o.color+';stop-opacity:.38"/><stop offset="1" style="stop-color:'+o.color+';stop-opacity:0"/></linearGradient></defs>'+grid+
+    '<path d="'+area+'" fill="url(#'+o.id+')"/><path d="'+line+'" fill="none" style="stroke:'+o.color+';stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round"/>'+dots+xl+hits+'</svg>';
+}
+function barChart(pts,o){
+  var W=640,H=o.h||220,L=40,R=10,T=10,B=26,iw=W-L-R,ih=H-T-B,n=pts.length;
+  var sc=scale(Math.max.apply(null,pts.map(function(p){return p.v}).concat([1])));
+  var Y=function(v){return T+ih*(1-v/sc.m)}, cw=iw/n, bw=Math.max(2,cw*.68);
+  var grid=sc.t.map(function(t){return '<line class="gl" x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(t).toFixed(1)+'" y2="'+Y(t).toFixed(1)+'"/><text class="ax" x="'+(L-6)+'" y="'+(Y(t)+3).toFixed(1)+'" text-anchor="end">'+short(t)+'</text>'}).join("");
+  var every=o.every||Math.ceil(n/8);
+  var bars=pts.map(function(p,i){
+    var x=L+i*cw+(cw-bw)/2, h=Math.max(p.v>0?2:0,ih-(Y(p.v)-T));
+    return '<rect x="'+x.toFixed(1)+'" y="'+(T+ih-h).toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'" rx="3" style="fill:'+(p.c||o.color)+'"/>'+
+      '<rect class="hit" x="'+(L+i*cw).toFixed(1)+'" y="'+T+'" width="'+cw.toFixed(1)+'" height="'+ih+'" data-tip="'+esc(p.t)+'"/>'+
+      (i%every===0?'<text class="ax" x="'+(L+i*cw+cw/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle">'+esc(p.l)+'</text>':'');
+  }).join("");
+  return '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(o.label||"Graphique")+'">'+grid+bars+'</svg>';
+}
+function donut(items,centerLabel){
+  var tot=items.reduce(function(s,i){return s+i.v},0);
+  if(!tot) return '<p class="note">Aucune donnée sur la période.</p>';
+  var r=62,C=2*Math.PI*r,off=0;
+  var segs=items.filter(function(i){return i.v>0}).map(function(i){
+    var len=i.v/tot*C;
+    var s='<circle cx="80" cy="80" r="'+r+'" fill="none" stroke="'+i.c+'" stroke-width="22" stroke-dasharray="'+len.toFixed(2)+" "+(C-len).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 80 80)" data-tip="'+esc(i.l+" : "+i.v+" ("+Math.round(i.v/tot*100)+" %)")+'"/>';
+    off+=len; return s;
+  }).join("");
+  var leg=items.map(function(i){return '<li><i style="background:'+i.c+'"></i>'+esc(i.l)+'<span><b style="color:var(--fg)">'+i.v+'</b> · '+Math.round(i.v/tot*100)+' %</span></li>'}).join("");
+  return '<div class="donutwrap"><svg viewBox="0 0 160 160" role="img" aria-label="'+esc(centerLabel)+'"><circle cx="80" cy="80" r="'+r+'" fill="none" style="stroke:var(--surface2)" stroke-width="22"/>'+segs+
+    '<text class="big" x="80" y="82" text-anchor="middle">'+tot+'</text><text class="small" x="80" y="96" text-anchor="middle">'+esc(centerLabel)+'</text></svg><ul class="legend">'+leg+'</ul></div>';
+}
+function hbars(items,color){
+  if(!items.length) return '<p class="note">Aucune donnée sur la période.</p>';
+  var mx=Math.max.apply(null,items.map(function(i){return i.v}).concat([1]));
+  return '<div class="hb">'+items.map(function(i){return '<div class="r"><div class="t"><b>'+esc(i.l)+'</b><span>'+esc(i.s||i.v)+'</span></div><div class="trk"><i style="width:'+Math.max(3,i.v/mx*100).toFixed(1)+'%;background:'+(i.c||color||"var(--green)")+'"></i></div></div>'}).join("")+'</div>';
+}
+function pctDelta(cur,prev){ if(!prev) return null; return Math.round((cur-prev)/prev*100) }
+function deltaPill(d){ if(d==null) return ""; return '<span class="delta '+(d>=0?"up":"down")+'">'+(d>=0?"▲ ":"▼ ")+Math.abs(d)+" % vs période préc.</span>" }
+
+/* ---------- Tableau de bord ---------- */
+$("rangeSeg").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-r]"); if(!b) return;
+  range=+b.dataset.r; [].forEach.call($("rangeSeg").children,function(x){x.setAttribute("aria-pressed",x===b)}); renderDash();
+});
+function renderDash(){
+  var today0=startOfDay(new Date()), start;
+  if(range>0){ start=new Date(today0); start.setDate(start.getDate()-(range-1)) }
+  else { var mn=orders.reduce(function(m,o){return Math.min(m,+new Date(o.created_at))},+today0); start=startOfDay(new Date(mn)) }
+  var span=Math.round((today0-start)/864e5)+1;
+  $("rangeNote").textContent=range>0?"Du "+fd(start)+" au "+fd(today0):"Depuis le "+fd(start);
+  var cur=orders.filter(function(o){return new Date(o.created_at)>=start}), prev=[];
+  if(range>0){ var ps=new Date(start); ps.setDate(ps.getDate()-range); prev=orders.filter(function(o){var t=new Date(o.created_at);return t>=ps&&t<start}) }
+  var del=function(a){return a.filter(function(o){return o.status==="delivered"})};
+  var cD=del(cur), pD=del(prev), pend=orders.filter(isTodo);
+  var rev=sum(cD,"total"), fee=sum(cD,"fee"), avg=cD.length?rev/cD.length:0, pAvg=pD.length?sum(pD,"total")/pD.length:0;
+  var rate=cur.length?Math.round(cD.length/cur.length*100):0;
+  var tdy=orders.filter(function(o){return dayKey(o.created_at)===dayKey(new Date())});
+  var kp=[
+    ['','💰','Chiffre d\'affaires',fmt(rev),deltaPill(range>0?pctDelta(rev,sum(pD,"total")):null)],
+    ['','🧾','Commandes',cur.length,deltaPill(range>0?pctDelta(cur.length,prev.length):null)],
+    ['','📈','Frais gagnés',fmt(fee),deltaPill(range>0?pctDelta(fee,sum(pD,"fee")):null)],
+    ['b','🛒','Panier moyen',fmt(avg),deltaPill(range>0?pctDelta(avg,pAvg):null)],
+    ['b','✅','Taux de livraison',rate+" %",'<span class="note">'+cD.length+' livrée(s) sur '+cur.length+'</span>'],
+    ['o','⏳','À traiter maintenant',pend.length,'<span class="note">'+fmt(sum(pend,"total"))+' en attente · '+tdy.length+' aujourd\'hui</span>']
+  ];
+  var h='<div class="kpis">'+kp.map(function(k){return '<div class="card kpi '+k[0]+'"><span class="ico">'+k[1]+'</span><span class="lab">'+k[2]+'</span><b>'+k[3]+'</b>'+k[4]+'</div>'}).join("")+'</div>';
+
+  var step=span>90?7:1, nb=Math.ceil(span/step), B=[], i;
+  for(i=0;i<nb;i++){ var d=new Date(start); d.setDate(d.getDate()+i*step); B.push({d:d,rev:0,cnt:0}) }
+  cur.forEach(function(o){
+    var idx=Math.floor(Math.round((startOfDay(o.created_at)-start)/864e5)/step); if(idx<0||idx>=nb) return;
+    B[idx].cnt++; if(o.status==="delivered") B[idx].rev+=(+o.total||0);
+  });
+  var lab=function(b){return step>1?"Sem. du "+fd(b.d):fd(b.d)};
+  var revPts=B.map(function(b){return {l:fd(b.d),v:b.rev,t:lab(b)+" · "+fmt(b.rev)}});
+  var cntPts=B.map(function(b){return {l:fd(b.d),v:b.cnt,t:lab(b)+" · "+b.cnt+" commande(s)"}});
+
+  var todo=pend.slice().sort(function(a,b){return new Date(a.created_at)-new Date(b.created_at)}).slice(0,6);
+  var todoH=todo.length?'<table class="dt"><tbody>'+todo.map(function(o){
+    return '<tr data-id="'+o.id+'"><td class="wrap"><b>'+esc(cname(o)||o.item_name)+'</b><div class="note">'+esc(o.item_name)+'</div></td><td class="r">'+fmt(o.total)+'<div>'+ageHtml(o)+'</div></td></tr>';
+  }).join("")+'</tbody></table><p style="margin:10px 0 0"><button class="btn s" data-go="orders" type="button">Traiter les commandes</button></p>':'<p class="note">Rien à traiter 🎉</p>';
+
+  h+='<div class="g g21"><div class="card chart"><h3>Chiffre d\'affaires'+(step>1?' (par semaine)':' (par jour)')+'</h3>'+areaChart(revPts,{id:"gRev",color:"var(--green)",label:"Chiffre d'affaires"})+'</div>'+
+     '<div class="card"><h3>À traiter maintenant</h3>'+todoH+'</div></div>';
+
+  h+='<div class="g g21"><div class="card chart"><h3>Commandes'+(step>1?' (par semaine)':' (par jour)')+'</h3>'+barChart(cntPts,{color:"var(--orange)",label:"Commandes"})+'</div>'+
+     '<div class="card"><h3>Répartition par réseau</h3>'+donut(["orange","mtn","moov"].map(function(op){return {l:OPN[op],v:cur.filter(function(o){return o.operator===op}).length,c:OPC[op]}}),"commandes")+'</div></div>';
+
+  var hours=[],wd=[],WN=["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
+  for(i=0;i<24;i++) hours.push(0); for(i=0;i<7;i++) wd.push(0);
+  cur.forEach(function(o){var t=new Date(o.created_at);hours[t.getHours()]++;wd[(t.getDay()+6)%7]++});
+  var tfN=cur.filter(function(o){return o.kind==="tf"}).length;
+  h+='<div class="g g3"><div class="card"><h3>Statuts</h3>'+donut(["paid_declared","verified","delivered","rejected"].map(function(s){return {l:STN[s],v:cur.filter(function(o){return o.status===s}).length,c:STC[s]}}),"commandes")+'</div>'+
+     '<div class="card chart"><h3>Heures d\'affluence</h3>'+barChart(hours.map(function(v,k){return {l:k+"h",v:v,t:k+"h : "+v+" commande(s)"}}),{color:"var(--blue)",h:200,every:4,label:"Commandes par heure"})+'</div>'+
+     '<div class="card chart"><h3>Jours de la semaine</h3>'+barChart(wd.map(function(v,k){return {l:WN[k],v:v,t:WN[k]+" : "+v+" commande(s)"}}),{color:"var(--green)",h:200,every:1,label:"Commandes par jour de semaine"})+
+     '<p class="note" style="margin:6px 0 0">Souscriptions : <b>'+(cur.length-tfN)+'</b> · Transferts : <b>'+tfN+'</b></p></div></div>';
+
+  var top={};cur.filter(function(o){return o.status!=="rejected"}).forEach(function(o){var t=top[o.item_name]||(top[o.item_name]={n:0,r:0});t.n++;if(o.status==="delivered")t.r+=(+o.total||0)});
+  var tl=Object.keys(top).sort(function(a,b){return top[b].n-top[a].n}).slice(0,6).map(function(k){return {l:k,v:top[k].n,s:top[k].n+" · "+fmt(top[k].r)}});
+  var cl={};cD.forEach(function(o){var k=clientKey(o),c=cl[k]||(cl[k]={name:cname(o)||o.email||o.phone,n:0,t:0});c.n++;c.t+=(+o.total||0)});
+  var cls=Object.keys(cl).sort(function(a,b){return cl[b].t-cl[a].t}).slice(0,6).map(function(k){return {l:cl[k].name,v:cl[k].t,s:fmt(cl[k].t)+" · "+cl[k].n+" cmd",c:"var(--orange)"}});
+  h+='<div class="g g11"><div class="card"><h3>Forfaits les plus demandés</h3>'+hbars(tl)+'</div><div class="card"><h3>Meilleurs clients (livré)</h3>'+hbars(cls)+'</div></div>';
+
+  h+='<div class="card"><h3>Dernières commandes</h3><div class="tablewrap"><table class="dt"><thead><tr><th>Date</th><th>Client</th><th>Forfait</th><th>Réseau</th><th class="r">Total</th><th>Statut</th></tr></thead><tbody>'+
+     orders.slice(0,8).map(function(o){return '<tr data-id="'+o.id+'"><td>'+esc(fdate(o.created_at))+'</td><td>'+esc(cname(o)||"—")+'</td><td class="cut">'+esc(o.item_name)+'</td><td><i class="opdot" style="background:'+(OPC[o.operator]||"#999")+'"></i>'+esc(OPN[o.operator]||o.operator)+'</td><td class="r">'+fmt(o.total)+'</td><td><span class="badge st-'+o.status+'">'+STN[o.status]+'</span></td></tr>'}).join("")+
+     '</tbody></table></div></div>';
+  $("dashBody").innerHTML=h; updateAges();
+}
+$("tab-dash").addEventListener("click",function(e){
+  var g=e.target.closest("[data-go]"); if(g){ goTab(g.dataset.go); return }
+  var r=e.target.closest("tr[data-id]"); if(r) openDetail(r.dataset.id);
+});
 
 /* ---------- Commandes ---------- */
 function filtered(){
-  var s=$("fStatus").value, op=$("fOp").value, q=$("fQ").value.trim().toLowerCase();
-  return orders.filter(function(o){
+  var s=$("fStatus").value, op=$("fOp").value, kd=$("fKind").value, q=$("fQ").value.trim().toLowerCase();
+  var f=$("fFrom").value?new Date($("fFrom").value+"T00:00:00"):null, t=$("fTo").value?new Date($("fTo").value+"T23:59:59"):null;
+  var l=orders.filter(function(o){
     if(s==="todo"){ if(!isTodo(o)) return false } else if(s!=="all"&&o.status!==s) return false;
     if(op!=="all"&&o.operator!==op) return false;
+    if(kd==="tf"&&o.kind!=="tf") return false;
+    if(kd==="sub"&&o.kind==="tf") return false;
+    var c=new Date(o.created_at); if(f&&c<f) return false; if(t&&c>t) return false;
     if(q){ var h=[o.ref,o.phone,o.dest_phone,o.email,o.item_name,o.category,cname(o)].join(" ").toLowerCase(); if(h.indexOf(q)<0) return false }
     return true;
   });
+  var so=$("fSort").value;
+  if(so==="old") l.sort(function(a,b){return new Date(a.created_at)-new Date(b.created_at)});
+  else if(so==="high") l.sort(function(a,b){return (b.total||0)-(a.total||0)});
+  else if(so==="low") l.sort(function(a,b){return (a.total||0)-(b.total||0)});
+  return l;
+}
+function cardHtml(o){
+  var tf=o.kind==="tf";
+  return '<div class="card order" data-id="'+o.id+'">'+
+    '<div class="top"><div><b>'+esc(o.item_name)+'</b><div class="note">'+esc(o.ref)+' · '+esc(fdate(o.created_at))+' '+ageHtml(o)+'</div></div>'+
+    '<div style="text-align:right"><span class="badge st-'+o.status+'">'+STN[o.status]+'</span><div><b>'+fmt(o.total)+'</b></div></div></div>'+
+    '<div class="kv">'+
+      (cname(o)?'<div><span>Client</span> <b>'+esc(cname(o))+'</b></div>':'')+
+      '<div><span>Réseau</span> <i class="opdot" style="background:'+(OPC[o.operator]||"#999")+'"></i>'+esc(OPN[o.operator]||o.operator)+'</div>'+
+      (o.category?'<div><span>Catégorie</span> '+esc(o.category)+'</div>':'')+
+      (tf?'<div><span>Bénéficiaire</span> <b>'+esc(o.dest_phone)+'</b></div><div><span>Expéditeur</span> '+esc(o.phone)+'</div><div><span>Transfert / frais</span> '+fmt(o.amount)+' / '+fmt(o.fee)+'</div>'
+         :'<div><span>Numéro à recharger</span> <b>'+esc(o.phone)+'</b></div><div><span>Prix / frais</span> '+fmt(o.amount)+' / '+fmt(o.fee)+'</div>')+
+      (o.email?'<div><span>Email</span> '+esc(o.email)+'</div>':'')+
+      (cleanNote(o)?'<div><span>Contenu</span> '+esc(cleanNote(o))+'</div>':'')+
+    '</div>'+
+    '<textarea rows="1" data-note placeholder="Note interne (facultatif)">'+esc(o.admin_note||"")+'</textarea>'+
+    '<div class="row">'+
+      (o.receipt_path?'<button class="btn o s" data-act="shot">Voir la capture Wave</button>':'<span class="note">Pas de capture</span>')+
+      (o.status==="paid_declared"?'<button class="btn o s" data-act="verified">Paiement vérifié</button>':'')+
+      (o.status!=="delivered"?'<button class="btn s" data-act="delivered">Marquer livrée</button>':waBtn(o))+
+      (o.status!=="rejected"?'<button class="btn d s" data-act="rejected">Refuser</button>':'')+
+      (o.status!=="paid_declared"?'<button class="btn g s" data-act="paid_declared">Remettre à traiter</button>':'')+
+      '<button class="btn g s" data-act="copy">Copier le n°</button>'+
+      '<button class="btn g s" data-act="savenote">Enregistrer la note</button>'+
+      '<button class="btn d s" data-act="del">Supprimer</button>'+
+    '</div></div>';
+}
+function tableHtml(list){
+  var all=list.length&&list.every(function(o){return selected[o.id]});
+  return '<div class="card flat"><div class="tablewrap"><table class="dt"><thead><tr><th><input type="checkbox" id="selAll" aria-label="Tout sélectionner"'+(all?" checked":"")+'></th><th>Réf.</th><th>Date</th><th>Client</th><th>Forfait</th><th>Réseau</th><th>Numéro</th><th class="r">Total</th><th>Statut</th><th></th></tr></thead><tbody>'+
+  list.map(function(o){
+    var tf=o.kind==="tf", q=o.status==="paid_declared"?'<button class="btn o s" data-act="verified">Vérifier</button>':o.status==="verified"?'<button class="btn s" data-act="delivered">Livrer</button>':o.status==="delivered"?waBtn(o):'';
+    return '<tr data-id="'+o.id+'"><td><input type="checkbox" data-sel '+(selected[o.id]?"checked":"")+' aria-label="Sélectionner"></td><td>'+esc(o.ref)+'</td><td>'+esc(fdate(o.created_at))+' '+ageHtml(o)+'</td><td>'+esc(cname(o)||"—")+'</td><td class="cut">'+esc(o.item_name)+(tf?' <span class="chip">transfert</span>':'')+'</td><td><i class="opdot" style="background:'+(OPC[o.operator]||"#999")+'"></i>'+esc(OPN[o.operator]||o.operator)+'</td><td>'+esc(tf?o.dest_phone:o.phone)+'</td><td class="r"><b>'+fmt(o.total)+'</b></td><td><span class="badge st-'+o.status+'">'+STN[o.status]+'</span></td><td>'+q+'</td></tr>';
+  }).join("")+'</tbody></table></div></div>';
 }
 function renderOrders(){
-  var list=filtered();
-  if(!list.length){ $("orderList").innerHTML='<div class="card note">Aucune commande pour ce filtre.</div>'; return }
-  $("orderList").innerHTML=list.map(function(o){
-    var tf=o.kind==="tf";
-    return '<div class="card order" data-id="'+o.id+'">'+
-      '<div class="top"><div><b>'+esc(o.item_name)+'</b><div class="note">'+esc(o.ref)+' · '+esc(fdate(o.created_at))+'</div></div>'+
-      '<div style="text-align:right"><span class="badge st-'+o.status+'">'+STN[o.status]+'</span><div><b>'+fmt(o.total)+'</b></div></div></div>'+
-      '<div class="kv">'+
-        (cname(o)?'<div><span>Client</span> <b>'+esc(cname(o))+'</b></div>':'')+
-        '<div><span>Réseau</span> '+esc(OPN[o.operator]||o.operator)+'</div>'+
-        (o.category?'<div><span>Catégorie</span> '+esc(o.category)+'</div>':'')+
-        (tf?'<div><span>Bénéficiaire</span> <b>'+esc(o.dest_phone)+'</b></div><div><span>Expéditeur</span> '+esc(o.phone)+'</div><div><span>Transfert / frais</span> '+fmt(o.amount)+' / '+fmt(o.fee)+'</div>'
-           :'<div><span>Numéro à recharger</span> <b>'+esc(o.phone)+'</b></div><div><span>Prix / frais</span> '+fmt(o.amount)+' / '+fmt(o.fee)+'</div>')+
-        (o.email?'<div><span>Email</span> '+esc(o.email)+'</div>':'')+
-        (cleanNote(o)?'<div><span>Contenu</span> '+esc(cleanNote(o))+'</div>':'')+
-      '</div>'+
-      '<textarea rows="1" data-note placeholder="Note interne (facultatif)">'+esc(o.admin_note||"")+'</textarea>'+
-      '<div class="row">'+
-        (o.receipt_path?'<button class="btn o s" data-act="shot">Voir la capture Wave</button>':'<span class="note">Pas de capture</span>')+
-        (o.status==="paid_declared"?'<button class="btn o s" data-act="verified">Paiement vérifié</button>':'')+
-        (o.status!=="delivered"?'<button class="btn s" data-act="delivered">Marquer livrée</button>':waBtn(o))+
-        (o.status!=="rejected"?'<button class="btn d s" data-act="rejected">Refuser</button>':'')+
-        (o.status!=="paid_declared"?'<button class="btn g s" data-act="paid_declared">Remettre à traiter</button>':'')+
-        '<button class="btn g s" data-act="copy">Copier le n°</button>'+
-        '<button class="btn g s" data-act="savenote">Enregistrer la note</button>'+
-        '<button class="btn d s" data-act="del">Supprimer</button>'+
-      '</div></div>';
-  }).join("");
+  var all=filtered(), list=all.slice(0,limit);
+  $("ordCount").innerHTML='<b>'+all.length+'</b> commande(s) · total <b>'+fmt(sum(all,"total"))+'</b> · frais <b>'+fmt(sum(all,"fee"))+'</b>';
+  if(!all.length){ $("orderList").innerHTML='<div class="card note">Aucune commande pour ce filtre.</div>'; renderBulk(); return }
+  var h=view==="table"?tableHtml(list):list.map(cardHtml).join("");
+  if(all.length>limit) h+='<p style="text-align:center"><button class="btn g" data-more type="button">Afficher plus ('+(all.length-limit)+')</button></p>';
+  $("orderList").innerHTML=h; renderBulk(); updateAges();
 }
-["fStatus","fOp"].forEach(function(i){$(i).addEventListener("change",renderOrders)});
-$("fQ").addEventListener("input",renderOrders);
-$("orderList").addEventListener("click",async function(e){
+function resetOrders(){ limit=30; renderOrders() }
+["fStatus","fOp","fKind","fSort","fFrom","fTo"].forEach(function(i){$(i).addEventListener("change",resetOrders)});
+$("fQ").addEventListener("input",resetOrders);
+$("viewSeg").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-v]"); if(!b) return;
+  view=b.dataset.v; [].forEach.call($("viewSeg").children,function(x){x.setAttribute("aria-pressed",x===b)}); renderOrders();
+});
+function renderBulk(){
+  var ids=Object.keys(selected), b=$("bulkBar");
+  if(!ids.length||view!=="table"){ b.hidden=true; return }
+  b.hidden=false; b.querySelector("[data-n]").textContent=ids.length;
+}
+$("bulkBar").addEventListener("click",async function(e){
+  var b=e.target.closest("button[data-bulk]"); if(!b) return;
+  var a=b.dataset.bulk, ids=Object.keys(selected);
+  if(a==="clear"){ selected={}; renderOrders(); return }
+  if(!ids.length) return;
+  if(a==="rejected"&&!confirm("Refuser "+ids.length+" commande(s) ?")) return;
+  var r=await sb.from("orders").update({status:a}).in("id",ids);
+  if(r.error){ toast("Erreur : "+r.error.message); return }
+  toast(ids.length+" commande(s) : "+STN[a]); stepVoice(a); selected={}; await loadOrders();
+});
+$("orderList").addEventListener("change",function(e){
+  var t=e.target;
+  if(t.id==="selAll"){ filtered().slice(0,limit).forEach(function(o){ if(t.checked) selected[o.id]=1; else delete selected[o.id] }); renderOrders(); return }
+  if(t.matches&&t.matches("input[data-sel]")){ var id=t.closest("tr").dataset.id; if(t.checked) selected[id]=1; else delete selected[id]; renderBulk() }
+});
+function findOrder(id){ return orders.filter(function(x){return x.id===id})[0] }
+function openDetail(id){ var o=findOrder(id); if(!o) return; openModal(cardHtml(o)+'<div class="row"><button class="btn g s" data-close type="button">Fermer</button></div>'); updateAges() }
+async function onAct(e){
   var b=e.target.closest("button[data-act]"); if(!b) return;
-  var card=b.closest(".order"), o=orders.filter(function(x){return x.id===card.dataset.id})[0]; if(!o) return;
-  var a=b.dataset.act;
+  var card=b.closest("[data-id]"), o=card&&findOrder(card.dataset.id); if(!o) return;
+  var a=b.dataset.act, inModal=!!b.closest("#modal");
   if(a==="copy"){ var n=o.kind==="tf"?o.dest_phone:o.phone; try{await navigator.clipboard.writeText(n);toast("Numéro copié")}catch(x){toast(n)} return }
   if(a==="shot"){
     var r=await sb.storage.from("receipts").createSignedUrl(o.receipt_path,600);
     if(r.error){toast("Capture introuvable");return}
-    openModal('<img src="'+esc(r.data.signedUrl)+'" alt="Capture Wave"><div class="row"><a class="btn g s" style="text-decoration:none" target="_blank" rel="noopener" href="'+esc(r.data.signedUrl)+'">Ouvrir en grand</a><button class="btn s" data-close>Fermer</button></div>');
+    $("modalIn2").innerHTML='<img src="'+esc(r.data.signedUrl)+'" alt="Capture Wave"><div class="row"><a class="btn g s" style="text-decoration:none" target="_blank" rel="noopener" href="'+esc(r.data.signedUrl)+'">Ouvrir en grand</a><button class="btn s" data-close type="button">Fermer</button></div>'; $("modal2").hidden=false;
     return;
   }
   if(a==="savenote"){ var v=card.querySelector("[data-note]").value.trim()||null; var r2=await sb.from("orders").update({admin_note:v}).eq("id",o.id); toast(r2.error?"Erreur":"Note enregistrée"); if(!r2.error)o.admin_note=v; return }
-  if(a==="del"){ if(!confirm("Supprimer définitivement cette commande ?")) return; if(o.receipt_path) await sb.storage.from("receipts").remove([o.receipt_path]); var r3=await sb.from("orders").delete().eq("id",o.id); if(r3.error){toast("Erreur");return} await loadOrders(); return }
+  if(a==="del"){ if(!confirm("Supprimer définitivement cette commande ?")) return; if(o.receipt_path) await sb.storage.from("receipts").remove([o.receipt_path]); var r3=await sb.from("orders").delete().eq("id",o.id); if(r3.error){toast("Erreur");return} if(inModal) $("modal").hidden=true; await loadOrders(); return }
   var r4=await sb.from("orders").update({status:a}).eq("id",o.id);
   if(r4.error){toast("Erreur : "+r4.error.message);return}
-  toast(STN[a]); await loadOrders(); if(a==="delivered") promptNotify(o);
+  toast(STN[a]); stepVoice(a); if(inModal) $("modal").hidden=true; await loadOrders(); if(a==="delivered") promptNotify(o);
+}
+$("orderList").addEventListener("click",function(e){
+  if(e.target.closest("[data-more]")){ limit+=30; renderOrders(); return }
+  if(e.target.closest("button[data-act]")){ onAct(e); return }
+  if(e.target.closest("a,input,label,textarea,button")) return;
+  var tr=e.target.closest("tr[data-id]"); if(tr) openDetail(tr.dataset.id);
 });
+$("modalIn").addEventListener("click",onAct);
 function openModal(h){$("modalIn").innerHTML=h;$("modal").hidden=false}
 $("modal").addEventListener("click",function(e){if(e.target===this||e.target.closest("[data-close]"))this.hidden=true});
+$("modal2").addEventListener("click",function(e){if(e.target===this||e.target.closest("[data-close]"))this.hidden=true});
+document.addEventListener("keydown",function(e){ if(e.key==="Escape"){ $("modal2").hidden=true; $("modal").hidden=true } });
 
-function csv(rows){return rows.map(function(r){return r.map(function(c){c=String(c==null?"":c);return /[",;\n]/.test(c)?'"'+c.replace(/"/g,'""')+'"':c}).join(";")}).join("\n")}
-function download(name,text){var a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+text],{type:"text/csv;charset=utf-8"}));a.download=name;document.body.appendChild(a);a.click();a.remove()}
 $("csvBtn").addEventListener("click",function(){
   var rows=[["Référence","Date","Type","Réseau","Catégorie","Forfait","Client","Numéro","Bénéficiaire","Email","Montant","Frais","Total","Statut","Note"]];
   filtered().forEach(function(o){rows.push([o.ref,fdate(o.created_at),o.kind==="tf"?"Transfert":"Souscription",OPN[o.operator],o.category,o.item_name,cname(o),o.phone,o.dest_phone,o.email,o.amount,o.fee,o.total,STN[o.status],o.admin_note])});
   download("commandes-kbine.csv",csv(rows));
 });
 
-/* ---------- Statistiques ---------- */
-function dayKey(d){var x=new Date(d);return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0")}
-function renderStats(){
-  var today=dayKey(new Date()), del=orders.filter(function(o){return o.status==="delivered"});
-  var td=orders.filter(function(o){return dayKey(o.created_at)===today});
-  var tdDel=del.filter(function(o){return dayKey(o.created_at)===today});
-  var sum=function(a,k){return a.reduce(function(s,o){return s+(o[k]||0)},0)};
-  var pend=orders.filter(isTodo);
-  var h='<h2>Aujourd\'hui</h2><div class="stats">'+
-    '<div class="card stat"><b>'+td.length+'</b><span>commandes reçues</span></div>'+
-    '<div class="card stat"><b>'+fmt(sum(tdDel,"total"))+'</b><span>encaissé (livré)</span></div>'+
-    '<div class="card stat"><b>'+fmt(sum(tdDel,"fee"))+'</b><span>frais gagnés</span></div>'+
-    '<div class="card stat"><b>'+pend.length+'</b><span>à traiter ('+fmt(sum(pend,"total"))+')</span></div></div>'+
-    '<h2>Total</h2><div class="stats">'+
-    '<div class="card stat"><b>'+orders.length+'</b><span>commandes</span></div>'+
-    '<div class="card stat"><b>'+del.length+'</b><span>livrées</span></div>'+
-    '<div class="card stat"><b>'+fmt(sum(del,"total"))+'</b><span>encaissé (livré)</span></div>'+
-    '<div class="card stat"><b>'+fmt(sum(del,"fee"))+'</b><span>frais gagnés</span></div></div>';
-  var days=[];for(var i=0;i<7;i++){var d=new Date();d.setDate(d.getDate()-i);days.push(dayKey(d))}
-  h+='<h2>7 derniers jours</h2><div class="card"><table><tr><th>Jour</th><th class="r">Commandes</th><th class="r">Livrées</th><th class="r">Encaissé</th></tr>'+
-    days.map(function(k){var a=orders.filter(function(o){return dayKey(o.created_at)===k}),b=a.filter(function(o){return o.status==="delivered"});return '<tr><td>'+esc(k.split("-").reverse().join("/"))+'</td><td class="r">'+a.length+'</td><td class="r">'+b.length+'</td><td class="r">'+fmt(sum(b,"total"))+'</td></tr>'}).join("")+'</table></div>';
-  h+='<h2>Par réseau (livrées)</h2><div class="card"><table><tr><th>Réseau</th><th class="r">Livrées</th><th class="r">Encaissé</th><th class="r">Frais</th></tr>'+
-    ["orange","mtn","moov"].map(function(op){var b=del.filter(function(o){return o.operator===op});return '<tr><td>'+OPN[op]+'</td><td class="r">'+b.length+'</td><td class="r">'+fmt(sum(b,"total"))+'</td><td class="r">'+fmt(sum(b,"fee"))+'</td></tr>'}).join("")+'</table></div>';
-  var top={};del.forEach(function(o){top[o.item_name]=(top[o.item_name]||0)+1});
-  var tl=Object.keys(top).sort(function(a,b){return top[b]-top[a]}).slice(0,8);
-  h+='<h2>Forfaits les plus vendus</h2><div class="card">'+(tl.length?'<table>'+tl.map(function(k){return '<tr><td>'+esc(k)+'</td><td class="r">'+top[k]+'</td></tr>'}).join("")+'</table>':'<span class="note">Pas encore de ventes livrées.</span>')+'</div>';
-  $("tab-stats").innerHTML=h;
-}
-
-/* ---------- Clients / emails ---------- */
-function renderClients(){
+/* ---------- Clients ---------- */
+function clientKey(o){ var e=(o.email||"").trim().toLowerCase(); return e||String(o.phone||"").replace(/\D/g,"")||cname(o)||o.id }
+var cSort="last", cQuery="";
+function buildClients(){
   var m={};
   orders.forEach(function(o){
-    var k=(o.email||"").trim().toLowerCase(); if(!k) return;
-    var c=m[k]||(m[k]={name:"",email:k,phones:{},n:0,total:0,last:o.created_at});
-    if(!c.name&&cname(o))c.name=cname(o);
-    c.phones[o.phone]=1;c.n++;if(o.status==="delivered")c.total+=o.total;if(o.created_at>c.last)c.last=o.created_at;
+    var k=clientKey(o), c=m[k]||(m[k]={name:"",email:"",phones:{},n:0,dn:0,total:0,last:o.created_at,first:o.created_at,lastPhone:o.phone});
+    if(!c.name&&cname(o)) c.name=cname(o);
+    if(!c.email&&o.email) c.email=String(o.email).trim().toLowerCase();
+    if(o.phone) c.phones[o.phone]=1;
+    c.n++; if(o.status==="delivered"){c.dn++;c.total+=(+o.total||0)}
+    if(o.created_at>c.last){c.last=o.created_at;c.lastPhone=o.phone}
+    if(o.created_at<c.first) c.first=o.created_at;
   });
-  var l=Object.keys(m).map(function(k){return m[k]}).sort(function(a,b){return a.last<b.last?1:-1});
-  var noMail=orders.filter(function(o){return !(o.email||"").trim()}).length;
-  $("tab-clients").innerHTML='<h2>Emails des clients ('+l.length+')</h2>'+
-    '<div class="bar"><button class="btn s" id="cpMails" type="button">Copier tous les emails</button><button class="btn g s" id="csvMails" type="button">Exporter CSV</button></div>'+
-    '<div class="card">'+(l.length?'<table><tr><th>Nom</th><th>Email</th><th>Numéros</th><th class="r">Cmd</th><th class="r">Dépensé</th></tr>'+
-    l.map(function(c){return '<tr><td>'+esc(c.name||"")+'</td><td>'+esc(c.email)+'</td><td>'+esc(Object.keys(c.phones).join(", "))+'</td><td class="r">'+c.n+'</td><td class="r">'+fmt(c.total)+'</td></tr>'}).join("")+'</table>':'<span class="note">Aucun email enregistré pour le moment.</span>')+'</div>'+
-    '<p class="note">'+noMail+' commande(s) sans email.</p>';
-  var cp=$("cpMails"); if(cp) cp.onclick=async function(){var t=l.map(function(c){return c.email}).join(", ");try{await navigator.clipboard.writeText(t);toast("Emails copiés")}catch(e){toast("Copie impossible")}};
-  var cv=$("csvMails"); if(cv) cv.onclick=function(){download("clients-kbine.csv",csv([["Nom","Email","Numéros","Commandes","Dépensé (livré)","Dernière commande"]].concat(l.map(function(c){return [c.name,c.email,Object.keys(c.phones).join(" "),c.n,c.total,fdate(c.last)]}))))};
+  return Object.keys(m).map(function(k){return m[k]});
+}
+function renderClients(){
+  var all=buildClients();
+  var rec=all.filter(function(c){return c.dn>=2}).length, best=all.slice().sort(function(a,b){return b.total-a.total})[0];
+  var q=cQuery.toLowerCase();
+  var l=all.filter(function(c){return !q||[c.name,c.email,Object.keys(c.phones).join(" ")].join(" ").toLowerCase().indexOf(q)>=0});
+  l.sort(function(a,b){ return cSort==="spent"?b.total-a.total:cSort==="count"?b.n-a.n:cSort==="name"?String(a.name).localeCompare(b.name):(a.last<b.last?1:-1) });
+  var mails=all.filter(function(c){return c.email}).length;
+  var h='<div class="kpis">'+
+    '<div class="card kpi"><span class="ico">👥</span><span class="lab">Clients</span><b>'+all.length+'</b><span class="note">'+mails+' avec email</span></div>'+
+    '<div class="card kpi o"><span class="ico">🔁</span><span class="lab">Clients fidèles</span><b>'+rec+'</b><span class="note">2 commandes livrées ou plus</span></div>'+
+    '<div class="card kpi b"><span class="ico">🛒</span><span class="lab">Dépense moyenne</span><b>'+fmt(all.length?sum(all,"total")/all.length:0)+'</b><span class="note">par client (livré)</span></div>'+
+    '<div class="card kpi"><span class="ico">🏆</span><span class="lab">Meilleur client</span><b style="font-size:1.05rem">'+esc(best&&best.total?(best.name||best.email||Object.keys(best.phones)[0]):"—")+'</b><span class="note">'+fmt(best?best.total:0)+'</span></div></div>'+
+    '<div class="bar"><input type="search" id="cQ" placeholder="Rechercher un client, email ou numéro" value="'+esc(cQuery)+'"><select id="cSortSel"><option value="last">Dernière commande</option><option value="spent">Plus dépensé</option><option value="count">Plus de commandes</option><option value="name">Nom A→Z</option></select>'+
+    '<button class="btn s" id="cpMails" type="button">Copier les emails</button><button class="btn g s" id="csvMails" type="button">Exporter CSV</button></div>'+
+    '<div class="card flat"><div class="tablewrap">'+(l.length?'<table class="dt"><thead><tr><th>Client</th><th>Email</th><th>Numéros</th><th class="r">Cmd</th><th class="r">Dépensé</th><th>Dernière</th><th></th></tr></thead><tbody>'+
+    l.map(function(c){
+      var tag=c.dn>=3?'<span class="chip"><b>Fidèle</b></span>':c.n===1?'<span class="chip">Nouveau</span>':'';
+      var wa=waNum(c.lastPhone);
+      return '<tr><td><b>'+esc(c.name||"—")+'</b> '+tag+'</td><td>'+esc(c.email||"")+'</td><td>'+esc(Object.keys(c.phones).join(", "))+'</td><td class="r">'+c.n+'</td><td class="r">'+fmt(c.total)+'</td><td>'+esc(fdate(c.last))+'</td><td>'+(wa?'<a class="btn wa s" target="_blank" rel="noopener" href="https://wa.me/'+wa+'?text='+encodeURIComponent("Bonjour"+(c.name?" "+c.name:"")+" 👋 K-Bine CI")+'">WhatsApp</a>':'')+'</td></tr>';
+    }).join("")+'</tbody></table>':'<p class="note" style="padding:10px">Aucun client trouvé.</p>')+'</div></div>';
+  $("tab-clients").innerHTML=h;
+  $("cSortSel").value=cSort;
+  $("cSortSel").onchange=function(){cSort=this.value;renderClients()};
+  $("cQ").oninput=function(){cQuery=this.value;var p=this.selectionStart;renderClients();var n=$("cQ");n.focus();try{n.setSelectionRange(p,p)}catch(e){}};
+  $("cpMails").onclick=async function(){var t=all.filter(function(c){return c.email}).map(function(c){return c.email}).join(", ");try{await navigator.clipboard.writeText(t);toast("Emails copiés")}catch(e){toast("Copie impossible")}};
+  $("csvMails").onclick=function(){download("clients-kbine.csv",csv([["Nom","Email","Numéros","Commandes","Dépensé (livré)","Dernière commande"]].concat(l.map(function(c){return [c.name,c.email,Object.keys(c.phones).join(" "),c.n,c.total,fdate(c.last)]}))))};
 }
 
 /* ---------- Prix ---------- */
@@ -439,6 +882,8 @@ async function renderPrices(){
   $("sFee").value = settings.sub_fee||""; $("sFrom").value = settings.sub_fee_from||""; $("sPct").value = settings.sub_fee_rate||""; $("sRate").value = settings.transfer_rate||""; $("sMin").value = settings.transfer_min||"";
   var cat = await loadCatalog();
   if(!cat.length){ $("priceList").innerHTML='<p class="note">Impossible de lire la liste des pass. Vérifiez que « siteUrl » dans config.js est bien l\'adresse de votre site client (avec / à la fin).</p>'; return }
+  var mods=Object.keys(overrides).length, hidden=Object.keys(overrides).filter(function(k){return overrides[k].active===false}).length;
+  $("pSummary").textContent=mods+" prix modifié(s), "+hidden+" pass masqué(s). Modifiez un prix ou décochez « Dispo » pour masquer un pass sur le site (visible dès le prochain chargement).";
   var op=$("pOp").value, q=$("pQ").value.trim().toLowerCase();
   var items=cat.filter(function(i){return i.op===op&&(!q||(i.name+" "+i.cat+" "+i.group).toLowerCase().indexOf(q)>=0)});
   var h="",lastCat="";
@@ -470,6 +915,74 @@ $("saveSettings").addEventListener("click",async function(){
   var r=await sb.from("settings").upsert(rows);
   if(r.error){toast("Erreur : "+r.error.message);return}
   rows.forEach(function(x){settings[x.key]=x.value}); renderPrices(); toast("Frais enregistrés");
+});
+
+/* ---------- Base de données (lecture seule) ---------- */
+var dbRows=[], dbCols=[], dbLoaded=false, dbSort={key:null,dir:1}, dbPage=0, DB_PAGE=50;
+function cellType(rows,k){
+  for(var i=0;i<rows.length;i++){ var v=rows[i][k]; if(v==null) continue;
+    if(typeof v==="number") return "nombre"; if(typeof v==="boolean") return "booléen";
+    if(typeof v==="object") return "json";
+    if(/_at$|^date/.test(k)&&!isNaN(Date.parse(v))) return "date"; return "texte" }
+  return "—";
+}
+function cellVal(k,v){
+  if(v==null) return '<span class="note">null</span>';
+  if(typeof v==="object") return esc(JSON.stringify(v));
+  if(/_at$/.test(k)&&!isNaN(Date.parse(v))) return esc(fdate(v));
+  return esc(v);
+}
+async function loadDb(){
+  var t=$("dbTable").value; dbLoaded=true; dbPage=0; dbSort={key:null,dir:1};
+  $("dbTableWrap").innerHTML='<p class="note" style="padding:12px">Chargement…</p>';
+  var q=sb.from(t).select("*").limit(5000);
+  if(t==="orders") q=q.order("created_at",{ascending:false});
+  var r=await q;
+  if(r.error){ dbRows=[]; dbCols=[]; $("dbInfo").textContent=""; $("dbSchema").innerHTML=""; $("dbTableWrap").innerHTML='<p class="err" style="padding:12px">Erreur : '+esc(r.error.message)+'</p>'; $("dbPager").innerHTML=""; return }
+  dbRows=r.data||[];
+  var cs={}; dbRows.forEach(function(o){Object.keys(o).forEach(function(k){cs[k]=1})}); dbCols=Object.keys(cs);
+  renderDb();
+}
+function dbFiltered(){
+  var q=$("dbQ").value.trim().toLowerCase(), l=dbRows;
+  if(q) l=l.filter(function(o){return dbCols.some(function(k){var v=o[k];return v!=null&&String(typeof v==="object"?JSON.stringify(v):v).toLowerCase().indexOf(q)>=0})});
+  if(dbSort.key){ var k=dbSort.key,d=dbSort.dir; l=l.slice().sort(function(a,b){var x=a[k],y=b[k]; if(x==null) return 1; if(y==null) return -1; return (typeof x==="number"&&typeof y==="number"?x-y:String(x).localeCompare(String(y),"fr",{numeric:true}))*d}) }
+  return l;
+}
+function renderDb(){
+  var l=dbFiltered(), pages=Math.max(1,Math.ceil(l.length/DB_PAGE)); if(dbPage>=pages) dbPage=pages-1;
+  var rows=l.slice(dbPage*DB_PAGE,dbPage*DB_PAGE+DB_PAGE);
+  $("dbInfo").innerHTML='<b>'+l.length+'</b> ligne(s)'+(l.length!==dbRows.length?' sur '+dbRows.length:'')+' · <b>'+dbCols.length+'</b> colonne(s) · table <b>'+esc($("dbTable").value)+'</b> (lecture seule)';
+  $("dbSchema").innerHTML=dbCols.map(function(k){return '<span class="chip">'+esc(k)+' <b>'+cellType(dbRows,k)+'</b></span>'}).join("");
+  if(!dbCols.length){ $("dbTableWrap").innerHTML='<p class="note" style="padding:12px">Table vide ou inaccessible.</p>'; $("dbPager").innerHTML=""; return }
+  $("dbTableWrap").innerHTML='<table class="dt"><thead><tr><th>#</th>'+dbCols.map(function(k){return '<th data-sort="'+esc(k)+'">'+esc(k)+(dbSort.key===k?(dbSort.dir>0?" ▲":" ▼"):"")+'</th>'}).join("")+'</tr></thead><tbody>'+
+    rows.map(function(o,i){return '<tr><td class="note">'+(dbPage*DB_PAGE+i+1)+'</td>'+dbCols.map(function(k){return '<td class="cut" title="'+esc(typeof o[k]==="object"?JSON.stringify(o[k]):o[k])+'">'+cellVal(k,o[k])+'</td>'}).join("")+'</tr>'}).join("")+'</tbody></table>';
+  $("dbPager").innerHTML='<span class="note">Page '+(dbPage+1)+' / '+pages+'</span><span class="row"><button class="btn g s" data-pg="-1" type="button"'+(dbPage<=0?" disabled":"")+'>← Précédent</button><button class="btn g s" data-pg="1" type="button"'+(dbPage>=pages-1?" disabled":"")+'>Suivant →</button></span>';
+}
+$("dbTable").addEventListener("change",loadDb);
+$("dbReload").addEventListener("click",loadDb);
+$("dbQ").addEventListener("input",function(){dbPage=0;renderDb()});
+$("dbTableWrap").addEventListener("click",function(e){
+  var th=e.target.closest("th[data-sort]"); if(!th) return;
+  var k=th.dataset.sort; if(dbSort.key===k) dbSort.dir*=-1; else dbSort={key:k,dir:1}; renderDb();
+});
+$("dbPager").addEventListener("click",function(e){ var b=e.target.closest("button[data-pg]"); if(!b) return; dbPage+=+b.dataset.pg; renderDb() });
+$("dbCsv").addEventListener("click",function(){
+  var l=dbFiltered(); if(!dbCols.length){toast("Rien à exporter");return}
+  download($("dbTable").value+".csv",csv([dbCols].concat(l.map(function(o){return dbCols.map(function(k){var v=o[k];return v!=null&&typeof v==="object"?JSON.stringify(v):v})}))));
+});
+$("dbJson").addEventListener("click",function(){
+  if(!dbCols.length){toast("Rien à exporter");return}
+  dl($("dbTable").value+".json",JSON.stringify(dbFiltered(),null,2),"application/json");
+});
+$("dbBackup").addEventListener("click",async function(){
+  var b=this; b.disabled=true; var out={exporte_le:new Date().toISOString(),tables:{}};
+  for(var t of ["orders","price_overrides","settings","admins"]){
+    var r=await sb.from(t).select("*").limit(50000);
+    out.tables[t]=r.error?{erreur:r.error.message}:(r.data||[]);
+  }
+  dl("sauvegarde-kbine-"+dayKey(new Date())+".json",JSON.stringify(out,null,2),"application/json");
+  b.disabled=false; toast("Sauvegarde téléchargée");
 });
 
 if("serviceWorker" in navigator){ window.addEventListener("load",function(){ navigator.serviceWorker.register("sw.js").catch(function(){}) }) }
